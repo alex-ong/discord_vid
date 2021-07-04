@@ -1,5 +1,6 @@
 # Discord Video Resizer
-Calculate and forward FFMPEG commands, while allowing specification of filesize
+Calculate and forward FFMPEG commands, staying under Discords 8MB limit.
+
 
 * You can just drag and drop a file into discord-vid.bat.
 * Otherwise, write your own version of discord-vid.bat
