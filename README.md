@@ -22,8 +22,13 @@ If you have Nitro, go to `discord_vid/disvid_lib.py` and change this line
 
 # Requirements
 
-* ffmpeg must be on your path https://ffmpeg.org/download.html
-* Python 3.x
+* `ffmpeg` must be installed, on your path https://ffmpeg.org/download.html
+	* this means you should be able to type `ffmpeg` into cmd and get a response
+* `Python 3.x` installed and on your path
+	* this means you sohiuld be able to type `python` into cmd and get a python3 terminal
 
 # Installation
-You can run `ADD_TO_PATH.bat` to add this directory to your path.
+* Download and unzip https://ffmpeg.org/download.html
+	* Add it to your path.
+* Download and install Python 3 https://www.python.org/downloads/windows/
+* (Optional) You can run `ADD_TO_PATH.bat` to add this directory to your path.
