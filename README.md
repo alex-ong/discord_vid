@@ -6,8 +6,8 @@ Calculate and forward FFMPEG commands, staying under Discords 8MB limit.
 * Otherwise, write your own version of discord-vid.bat
 
 You can also add `discord_vid` to `PATH`, enabling you to run: 
-
 `dv filename.mp4`
+
 
 It uses fixed 64Kbit for Audio, and Dynamic Kbit for Video. 
 
@@ -19,3 +19,6 @@ After this, if the filesize is still too big after generation, it will reduce Ta
 
 * ffmpeg must be on your path https://ffmpeg.org/download.html
 * Python 3.x
+
+# Installation
+You can run `ADD_TO_PATH.bat` to add this directory to your path.
