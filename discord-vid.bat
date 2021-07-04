@@ -12,7 +12,3 @@ if %ERRORLEVEL% EQU 0 (
 ) else (
 	%~dp0discord-vid-libx264.bat %1
 )
-
-
-pause
-
