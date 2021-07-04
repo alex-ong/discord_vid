@@ -4,6 +4,7 @@ import glob
 import os
 
 TARGET_SIZE = 8100
+AUDIO_RATE = 64
 def get_length(filename):
     result = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
                              "format=duration", "-of",
@@ -33,7 +34,7 @@ def delete_logs():
         os.remove(file_path)
     
 def generate_file(target_size):
-    bitrate = (target_size*8 - audio_rate*length)/ length
+    bitrate = (target_size*8 - AUDIO_RATE*length)/ length
     if bitrate < 0:
         print(f"Unfortunately there is not enough bits for video!")
         sys.exit()
@@ -76,8 +77,7 @@ if __name__ == "__main__":
     length = get_length(filename)
     print(f"File length:{length} seconds")
     
-    audio_rate = 64
-    print(f"estimated audio size:, {audio_rate*length/8}KB")
+    print(f"estimated audio size:, {AUDIO_RATE*length/8}KB")
     
     target_size = TARGET_SIZE
     actual_size = generate_file(target_size)
