@@ -14,3 +14,8 @@ It uses fixed 64Kbit for Audio, and Dynamic Kbit for Video.
 If filesize is way too small (<7.5MB) then it will dynamically change target bitrate to get closer to 8MB.
 
 After this, if the filesize is still too big after generation, it will reduce Target File Size by 100Kb until RealFileSize is under 8MB
+
+# Requirements
+
+* ffmpeg must be on your path https://ffmpeg.org/download.html
+* Python 3.x
