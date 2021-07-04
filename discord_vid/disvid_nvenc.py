@@ -7,9 +7,9 @@ import os
 from disvid_lib import generate_file_loop, NITRO, scale_rate
 
 # These are defined here because different encoders
-# Have different overheads
+# have different overheads. It's just a starting point.
 TARGET_SIZE = 7600
-TARGET_SIZE_NITRO = 48500
+TARGET_SIZE_NITRO = 50*1024
 
         
 def generate_file(v_rate, a_rate):
@@ -17,13 +17,13 @@ def generate_file(v_rate, a_rate):
     Generate file with nvenc options auto-injected
     """
     scale_cmd = scale_rate()
-    if NITRO:
-        v_rate *= 0.95 #account for video overhead
+
     # fmt: off
     command = (
         ["ffmpeg", "-y"]
         + sys.argv[1:-1] # passthrough options.
-        + [ "-b:v", f"{v_rate:.0f}k", "-maxrate", f"{v_rate*2:.0f}k",
+        + [ "-b:v", f"{v_rate:.0f}k", "-maxrate", f"{v_rate*1.5:.0f}k",
+            "-minrate", f"{v_rate:.0f}k",
             "-bufsize", "1M",
             "-b:a",f"{a_rate:.0f}k"]
         )

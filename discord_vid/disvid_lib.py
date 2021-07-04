@@ -11,13 +11,13 @@ AUDIO_RATE_NITRO = 128
 FULL_SIZE_BYTES = 8 * 1024 * 1024
 FULL_SIZE_BYTES_NITRO = 50 * 1024 * 1024
 MIN_SIZE_BYTES_NITRO = .90 * FULL_SIZE_BYTES_NITRO
-MIN_SIZE_BYTES = .95*FULL_SIZE_BYTES
+MIN_SIZE_BYTES = .90*FULL_SIZE_BYTES
 
 NITRO=True
 if NITRO:
     FULL_SIZE_BYTES = FULL_SIZE_BYTES_NITRO
     AUDIO_RATE = AUDIO_RATE_NITRO
-    MIN_SIZE_BYTES = FULL_SIZE_BYTES_NITRO
+    MIN_SIZE_BYTES = MIN_SIZE_BYTES_NITRO
 
 
 def scale_rate():
@@ -125,23 +125,38 @@ def generate_file_loop(generate_file_func, target_size):
     actual_size = generate_file_loop_iter(target_size, length, generate_file_func)
 
     if actual_size < MIN_SIZE_BYTES:
-        print(f"For some reason we got a REALLY low file size:{actual_size / 1024 / 1024.0}")        
-        target_size *= float(FULL_SIZE_BYTES) / actual_size
+        print (actual_size/MIN_SIZE_BYTES, actual_size, MIN_SIZE_BYTES)
+        print(f"For some reason we got a REALLY low file size:")        
+        print(f"Actual: {bytes_to_mb(actual_size)}\n" +
+              f"Target {kb_to_mb(target_size)}")
+        target_size *= float(FULL_SIZE_BYTES) / (actual_size*1.02)
+        print(f"New Target size: {kb_to_mb(target_size)}")
         actual_size = generate_file_loop_iter(target_size, length, generate_file_func)
-
+        
+        
     while actual_size > FULL_SIZE_BYTES:
-        print("Uh oh, we're still over size: ", actual_size / 1024 / 1024.0)
-        target_size -= int(.01*FULL_SIZE_BYTES)
+        print(f"Uh oh, we're still over size.\n" +
+              f"Actual: {bytes_to_mb(actual_size)}\n" +
+              f"Target supplied: {kb_to_mb(target_size)}")
+        target_size -= int(.01*FULL_SIZE_BYTES/1024.0)
+        print (f"New Target: {kb_to_mb(target_size)}")
         actual_size = generate_file_loop_iter(target_size, length, generate_file_func)
 
-
+def kb_to_mb(value):
+    return value / 1024.0
+    
+def bytes_to_mb(value):
+    return value / 1024 / 1024.0
+    
 def generate_file_loop_iter(target_size, length, func):
     """
     one loop of the file generation process
     """
     bitrate = get_bitrate(target_size, length)
+    
     if bitrate < 0:
         print("Unfortunately there is not enough bits for video!")
+        print(f"Bitrate: {bitrate}, Target: {target_size}mb")
         sys.exit()
     actual_size = func(bitrate, AUDIO_RATE)
     delete_logs()  # only necessary for libx264, but lets just delete it always.
