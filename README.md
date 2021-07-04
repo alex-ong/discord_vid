@@ -1,19 +1,24 @@
 # Discord Video Resizer
 Calculate and forward FFMPEG commands, staying under Discords 8MB limit.
 
-
 * You can just drag and drop a file into discord-vid.bat.
 * Otherwise, write your own version of discord-vid.bat
 
 You can also add `discord_vid` to `PATH`, enabling you to run: 
 `dv filename.mp4`
 
+# Resolution
 
-It uses fixed 64Kbit for Audio, and Dynamic Kbit for Video. 
+If you have Nitro, go to `discord_vid/disvid_lib.py` and change this line
+`NITRO=False` to `NITRO=True`
 
-If filesize is way too small (<7.5MB) then it will dynamically change target bitrate to get closer to 8MB.
+| Preset        | 8MB(default) | 50MB(Nitro=True) |
+|---------------|--------------|------------------|
+| Framerate     | 30           | Untouched        |
+| Resolution    | 1280:-1      | Untouched        |
+| Video Bitrate | Calculated   | Calculated       |
+| Audio Bitrate | 64kbps       | 128kbps          |
 
-After this, if the filesize is still too big after generation, it will reduce Target File Size by 100Kb until RealFileSize is under 8MB
 
 # Requirements
 
