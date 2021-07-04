@@ -7,9 +7,23 @@ import subprocess
 import sys
 
 AUDIO_RATE = 64
+AUDIO_RATE_NITRO = 128
 FULL_SIZE_BYTES = 8 * 1024 * 1024
-MIN_SIZE_BYTES = int(7.5 * 1024 * 1024)
+FULL_SIZE_BYTES_NITRO = 50 * 1024 * 1024
+MIN_SIZE_BYTES = .95*FULL_SIZE_BYTES
 
+NITRO=False
+if NITRO:
+    FULL_SIZE_BYTES = FULL_SIZE_BYTES_NITRO
+    AUDIO_RATE = AUDIO_RATE_NITRO
+    MIN_SIZE_BYTES = .95*FULL_SIZE_BYTES
+
+
+def scale_rate():
+    if NITRO:
+        return None
+    
+    return "-vf scale=1280:-1 -r 30"
 
 def check_nvidia():
     """
@@ -111,9 +125,9 @@ def generate_file_loop(generate_file_func, target_size):
         target_size *= float(FULL_SIZE_BYTES) / actual_size
         actual_size = generate_file_loop_iter(target_size, length, generate_file_func)
 
-    while actual_size > 8 * 1024 * 1024:
+    while actual_size > FULL_SIZE_BYTES:
         print("Uh oh, we're still over size: ", actual_size / 1024 / 1024.0)
-        target_size -= 100
+        target_size -= int(.01*FULL_SIZE_BYTES)
         actual_size = generate_file_loop_iter(target_size, length, generate_file_func)
 
 
