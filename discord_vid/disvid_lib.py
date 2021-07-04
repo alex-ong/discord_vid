@@ -10,16 +10,20 @@ AUDIO_RATE = 64
 AUDIO_RATE_NITRO = 128
 FULL_SIZE_BYTES = 8 * 1024 * 1024
 FULL_SIZE_BYTES_NITRO = 50 * 1024 * 1024
+MIN_SIZE_BYTES_NITRO = .90 * FULL_SIZE_BYTES_NITRO
 MIN_SIZE_BYTES = .95*FULL_SIZE_BYTES
 
-NITRO=False
+NITRO=True
 if NITRO:
     FULL_SIZE_BYTES = FULL_SIZE_BYTES_NITRO
     AUDIO_RATE = AUDIO_RATE_NITRO
-    MIN_SIZE_BYTES = .95*FULL_SIZE_BYTES
+    MIN_SIZE_BYTES = FULL_SIZE_BYTES_NITRO
 
 
 def scale_rate():
+    """
+    returns scale factor and fps based on NITRO
+    """
     if NITRO:
         return None
     
@@ -121,7 +125,7 @@ def generate_file_loop(generate_file_func, target_size):
     actual_size = generate_file_loop_iter(target_size, length, generate_file_func)
 
     if actual_size < MIN_SIZE_BYTES:
-        print("For some reason we got a REALLY low file size.")
+        print(f"For some reason we got a REALLY low file size:{actual_size / 1024 / 1024.0}")        
         target_size *= float(FULL_SIZE_BYTES) / actual_size
         actual_size = generate_file_loop_iter(target_size, length, generate_file_func)
 

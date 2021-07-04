@@ -9,7 +9,7 @@ from disvid_lib import generate_file_loop, NITRO, scale_rate
 # These are defined here because different encoders
 # Have different overheads
 TARGET_FILE_SIZE = 8100
-TARGET_FILE_SIZE_NITRO = 49500
+TARGET_FILE_SIZE_NITRO = 48500
 
 
 def generate_file(v_rate, a_rate):
