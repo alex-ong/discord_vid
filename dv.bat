@@ -1,3 +1,3 @@
 @echo off
-%~dp0discord-vid.bat %1
+"%~dp0discord-vid.bat" %1
 
