@@ -53,7 +53,7 @@ winget install 7zip.7zip
 
 echo Trying to find 7z now that we've actually installed it
 WHERE 7z
-IF !ERRORLEVEL! EQU 0 (
+IF %ERRORLEVEL% EQU 0 (
 	echo 7zip is installed and found!
 	pause
 	exit /B 0
