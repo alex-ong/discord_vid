@@ -13,7 +13,10 @@ IF %ERRORLEVEL% EQU 0 (
  echo Here is it's current version:
  echo.
  ffmpeg -version
- pause
+ rem google told me to use NOT == rather than command extensions
+ if NOT "%1"=="update" (
+	pause
+ )
  where ffmpeg > ffmpeg_path.txt
  set /p ffmpeg_path=<ffmpeg_path.txt
  call :file_name_from_path ff_folder !ffmpeg_path!
@@ -23,6 +26,11 @@ IF %ERRORLEVEL% EQU 0 (
  echo Would you like to update ffmpeg in this folder:
  echo !ff_folder!
  
+ if "%1"=="update" (
+	echo auto-upgrading!
+	chdir /d "!ff_folder!"
+	goto install_app
+ )
  echo If not sure, don't do it man!
  CHOICE /C YN /M "Press Y for Yes, N for No:"
  if !ERRORLEVEL! EQU 1 (
@@ -46,6 +54,8 @@ echo New PATH variable (user, not system):
 echo "%USERPATH%%cd%\ffmpeg\;"
 	setx Path "!USERPATH!%cd%\ffmpeg\;"	
 	set PATH=!PATH!%cd%\ffmpeg\;
+	mkdir ffmpeg
+	cd /d ffmpeg
 ) 
 
 :install_app
@@ -58,7 +68,8 @@ echo.
 rem download ffmpeg
 powershell -command "wget https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z -OutFile ffmpeg.7z"
 rem this will only extract .exe to ffmpeg folder
-7z e ffmpeg.7z -offmpeg *.exe -r
+
+7z e ffmpeg.7z *.exe -r -aoa
 del ffmpeg.7z
 
 echo Trying to find ffmpeg now that we've fully installed it
