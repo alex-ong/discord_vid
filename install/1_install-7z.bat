@@ -34,7 +34,7 @@ if %ERRORLEVEL% EQU 1 (
 	rem echo %PATH%
 	rem echo.
 	pause
-	set PATH=!PATH!C:\Program Files\7-Zip;
+	set PATH=!PATH!;C:\Program Files\7-Zip;
   
 	echo.
 	echo Trying to find 7z now that we've added it to path
