@@ -18,11 +18,11 @@ call :resolve "%newDir%" resolvedDir
 
 For /F "Skip=2Tokens=1-2*" %%A In ('Reg Query HKCU\Environment /V PATH 2^>Nul') Do set USERPATH=%%C
 echo New path:
-echo %USERPATH%%resolvedDir%;
+echo %USERPATH%;%resolvedDir%;
 echo Press enter to set your path, or close this prompt to cancel
 pause
-setx Path "%USERPATH%%resolvedDir%;"
-set PATH=%PATH%%resolvedDir%;
+setx Path "%USERPATH%;%resolvedDir%;"
+set PATH=%PATH%;%resolvedDir%;
 
 echo All done!
 

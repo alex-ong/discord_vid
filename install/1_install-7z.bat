@@ -19,7 +19,7 @@ echo.
 
 For /F "Skip=2Tokens=1-2*" %%A In ('Reg Query HKCU\Environment /V PATH 2^>Nul') Do set USERPATH=%%C
 echo New PATH variable (user, not system):
-echo "%USERPATH%C:\Program Files\7-Zip;"
+echo "%USERPATH%;C:\Program Files\7-Zip;"
 
 echo.
 echo Would you like to add 7z to the path?
@@ -28,7 +28,7 @@ CHOICE /C YN /M "Press Y for Yes, N for No:"
 
 if %ERRORLEVEL% EQU 1 (
 	
-	setx Path "!USERPATH!C:\Program Files\7-Zip;"
+	setx Path "!USERPATH!;C:\Program Files\7-Zip;"
 	rem sets path in this local window
 	rem echo.
 	rem echo %PATH%
