@@ -4,7 +4,7 @@ discord vid libx264 implementation
 import sys
 import subprocess
 import os
-from disvid_lib import generate_file_loop, NITRO, scale_rate
+from discord_vid.disvid_lib import generate_file_loop, NITRO, scale_rate
 
 # These are defined here because different encoders
 # have different overheads. It's just a starting point.
