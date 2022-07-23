@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from install.modify_path import download_file
+from install.helpers import download_file
 
 FFMPEG_PATH = "./ffmpeg/"
 FFMPEG_EXE = FFMPEG_PATH + "ffmpeg.exe"

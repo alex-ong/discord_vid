@@ -1,7 +1,7 @@
 import subprocess
 import os
 
-from install.modify_path import add_to_path
+from install.helpers import add_to_path
 SEVEN_ZIP_INSTALL_PATH = "C:\\Program Files\\7-Zip\\"
 
 def install_7z(force=False):

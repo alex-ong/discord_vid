@@ -1,8 +1,8 @@
 import subprocess
 import requests
-import sys
+
 import os
-from install.modify_path import download_file
+from install.helpers import download_file
 WINGET_URL = "https://github.com/microsoft/winget-cli/releases/"
 GITHUB_URL = "https://github.com"
 
@@ -17,7 +17,7 @@ def get_latest_url():
             end = word.rindex('"')
             word = word[start:end]
             candidates.append(word)
-    print(candidates)
+    
     return GITHUB_URL + candidates[0]
     
 
