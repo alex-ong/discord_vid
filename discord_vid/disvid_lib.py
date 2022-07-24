@@ -5,7 +5,8 @@ import glob
 import os
 import subprocess
 import sys
-from install.install_ffmpeg import FFMPEG_EXE, FFPROBE_EXE
+from install.install_ffmpeg import FFPROBE_EXE
+
 
 def get_audio_rate(output_options):
     """
@@ -13,7 +14,7 @@ def get_audio_rate(output_options):
     assumes its already specified in k (e.g: 64k, 128k)
     """
     audio_index = output_options.index("-b:a") + 1
-    return int(output_options[audio_index].lower().replace("k","")) * 1000
+    return int(output_options[audio_index].lower().replace("k", "")) * 1000
 
 
 def check_nvidia():
@@ -90,7 +91,7 @@ def get_bitrate(target_size, length, audio_rate):
     @audio_rate: Rate in Kbits/s
     return: bitrate in Kbit/s
     """
-    audio_size = audio_rate * length 
+    audio_size = audio_rate * length
     target_size_kbits = target_size * 8
     bitrate = (target_size_kbits - audio_size) / length
     return bitrate
@@ -110,50 +111,68 @@ def generate_file_loop(generate_file_func, target_size, options):
     filename = input_options[filename_index]
     audio_rate = get_audio_rate(options[1])
 
-    
     print(f"Getting file:{filename}")
     length = get_length(filename)
     print(f"File length:{length} seconds")
     print(f"Estimated audio size: {audio_rate*length/8/1024:.0f}KB")
-    
+
     min_size, target_size, max_size = target_size
-    actual_size = generate_file_loop_iter(target_size, length, generate_file_func, options)
-        
+    actual_size = generate_file_loop_iter(
+        target_size, length, generate_file_func, options
+    )
+
     if actual_size < min_size:
-        print (actual_size/min_size, actual_size, min_size)
-        print(f"For some reason we got a REALLY low file size:")
-        print(f"Actual: {bytes_to_mb(actual_size)}\n" +
-              f"Target {kb_to_mb(target_size)}")
-        target_size *= float(max_size) / (actual_size*1.02)
+        print(actual_size / min_size, actual_size, min_size)
+        print("For some reason we got a REALLY low file size:")
+        print(
+            f"Actual: {bytes_to_mb(actual_size)}\n" + f"Target {kb_to_mb(target_size)}"
+        )
+        target_size *= float(max_size) / (actual_size * 1.02)
         print(f"New Target size: {kb_to_mb(target_size)}")
-        actual_size = generate_file_loop_iter(target_size, length, generate_file_func, options)
-        
-        
+        actual_size = generate_file_loop_iter(
+            target_size, length, generate_file_func, options
+        )
+
     while actual_size > max_size:
-        print(f"Uh oh, we're still over size.\n" +
-              f"Actual: {bytes_to_mb(actual_size)}\n" +
-              f"Target supplied: {kb_to_mb(target_size)}")
-        target_size -= int(.01*max_size)
-        print (f"New Target: {kb_to_mb(target_size)}")
-        actual_size = generate_file_loop_iter(target_size, length, generate_file_func, options)
+        print(
+            "Uh oh, we're still over size.\n"
+            + f"Actual: {bytes_to_mb(actual_size)}\n"
+            + f"Target supplied: {kb_to_mb(target_size)}"
+        )
+        target_size -= int(0.01 * max_size)
+        print(f"New Target: {kb_to_mb(target_size)}")
+        actual_size = generate_file_loop_iter(
+            target_size, length, generate_file_func, options
+        )
 
     print("all done:")
-    print(f"Actual: {bytes_to_mb(actual_size)}\n"
-        + f"Target supplied: {kb_to_mb(target_size)}")
+    print(
+        f"Actual: {bytes_to_mb(actual_size)}\n"
+        + f"Target supplied: {kb_to_mb(target_size)}"
+    )
+
 
 def kb_to_mb(value):
+    """
+    Converts KibiBytes to MebiBytes
+    """
     return value / 1024.0
-    
+
+
 def bytes_to_mb(value):
+    """
+    Converts bytes to Mebibytes
+    """
     return value / 1024 / 1024.0
-    
+
+
 def generate_file_loop_iter(target_size, length, func, options):
     """
     one loop of the file generation process
     """
     audio_rate = get_audio_rate(options[1])
     bitrate = get_bitrate(target_size, length, audio_rate)
-    
+
     if bitrate < 0:
         print("Unfortunately there is not enough bits for video!")
         print(f"Bitrate: {bitrate}, Target: {target_size}mb")

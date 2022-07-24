@@ -1,7 +1,6 @@
 """
 discord vid libx264 implementation
 """
-import sys
 import subprocess
 import os
 
@@ -12,16 +11,20 @@ from install.install_ffmpeg import FFMPEG_EXE
 # TARGET_SIZE = 7600
 # TARGET_SIZE_NITRO = 50*1024
 
+
 def guess_target(max_size):
+    """
+    guesses the target size based on max size and AI
+    """
     if max_size <= 9000:
         return 0.95 * max_size
-    else:
-        return 0.98 * max_size
-        
+    return 0.98 * max_size
+
+
 def generate_file(v_rate, a_rate, options):
     """
     Generate file with nvenc options auto-injected
-    """    
+    """
 
     input_options, output_options = options
     v_rate /= 1024

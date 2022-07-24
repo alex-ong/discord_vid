@@ -1,7 +1,6 @@
 """
 discord vid libx264 implementation
 """
-import sys
 import subprocess
 import os
 from install.install_ffmpeg import FFMPEG_EXE
@@ -11,17 +10,21 @@ from install.install_ffmpeg import FFMPEG_EXE
 TARGET_FILE_SIZE = 8100
 TARGET_FILE_SIZE_NITRO = 48500
 
+
 def guess_target(max_size):
+    """
+    guesses the target size based on max size and AI
+    """
     if max_size <= 9000:
         return 1.02 * max_size
-    else:
-        return 0.97 * max_size
+    return 0.97 * max_size
+
 
 def generate_file(v_rate, a_rate, options):
     """
     Generate file with libx264 2-pass options auto-injected
     """
-    
+
     input_options, output_options = options
     v_rate /= 1024
     a_rate /= 1024
@@ -37,9 +40,8 @@ def generate_file(v_rate, a_rate, options):
         + "-an -pass 1 -f mp4".split()
         + output_no_file
         + ["NUL"]
-        ) 
-        
-    
+        )
+
     # fmt: on
     print(" ".join(command))
     subprocess.run(command, check=True)
@@ -54,11 +56,9 @@ def generate_file(v_rate, a_rate, options):
         + f"-b:a {a_rate:.0f}k".split()
         + "-pass 2".split()
         + output_options
-    )    
+    )
     # fmt: on
     subprocess.run(command, check=True)
     output_file = output_options[-1]
 
     return os.path.getsize(output_file)
-
-

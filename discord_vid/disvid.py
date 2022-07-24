@@ -1,21 +1,25 @@
-from discord_vid import disvid_lib
-from discord_vid import disvid_libx264
-from discord_vid import disvid_nvenc
-from discord_vid.preset import Preset, PresetOptions
+"""
+Main entrypoint for command line based conversion
+"""
 import os
 import sys
 
-
-
+from discord_vid import disvid_lib
+from discord_vid import disvid_libx264
+from discord_vid import disvid_nvenc
+from discord_vid.preset import Preset, get_preset_options
 
 
 def convert(preset: str, filename):
+    """
+    Converts a given filename using the provided preset
+    """
     preset = Preset.from_str(preset)
     print(f"Converting {filename} using {preset.name}")
-    
-    size, output_options = PresetOptions(preset)
+
+    size, output_options = get_preset_options(preset)
     size = list(size)
-    
+
     input_options = ["-i", filename]
     options = [input_options, output_options]
     has_nvidia = disvid_lib.check_nvidia()
@@ -34,7 +38,7 @@ def convert(preset: str, filename):
 
 
 # pipenv run python -m discord_vid.disvid {PRESET} file.mp4
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("python -m discord_vid.disvid {PRESET} file.mp4")
         sys.exit()
