@@ -20,7 +20,7 @@ def convert(preset: str, filename):
     options = [input_options, output_options]
     has_nvidia = disvid_lib.check_nvidia()
     # choose encoder
-    
+    has_nvidia = False
     if has_nvidia:
         size[1] = disvid_nvenc.guess_target(size[2])
         filename = os.path.splitext(filename)[0] + "_nvenc.mp4"
@@ -31,9 +31,7 @@ def convert(preset: str, filename):
         size[1] = disvid_libx264.guess_target(size[2])
         filename = os.path.splitext(filename)[0] + "_libx264.mp4"
         output_options += [filename]
-        pass
-        #disvid_lib.generate_file_loop(disvid_x264.generate_file, size, options)
-    # do encoder in loop
+        disvid_lib.generate_file_loop(disvid_libx264.generate_file, size, options)
 
 
 # pipenv run python -m discord_vid.disvid {PRESET} file.mp4
