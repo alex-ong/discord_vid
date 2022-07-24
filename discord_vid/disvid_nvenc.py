@@ -4,39 +4,41 @@ discord vid libx264 implementation
 import sys
 import subprocess
 import os
-from discord_vid.disvid_lib import generate_file_loop, NITRO, scale_rate
+
+from install.install_ffmpeg import FFMPEG_EXE
 
 # These are defined here because different encoders
 # have different overheads. It's just a starting point.
-TARGET_SIZE = 7600
-TARGET_SIZE_NITRO = 50*1024
+# TARGET_SIZE = 7600
+# TARGET_SIZE_NITRO = 50*1024
 
+def guess_target(max_size):
+    if max_size <= 9000:
+        return 0.95 * max_size
+    else:
+        return 0.98 * max_size
         
-def generate_file(v_rate, a_rate):
+def generate_file(v_rate, a_rate, options):
     """
     Generate file with nvenc options auto-injected
-    """
-    scale_cmd = scale_rate()
+    """    
 
+    input_options, output_options = options
+    v_rate /= 1024
+    a_rate /= 1024
     # fmt: off
     command = (
-        ["ffmpeg", "-y"]
-        + sys.argv[1:-1] # passthrough options.
+        [FFMPEG_EXE, "-y"]
+        + input_options
         + [ "-b:v", f"{v_rate:.0f}k", "-maxrate", f"{v_rate*1.5:.0f}k",
             "-minrate", f"{v_rate:.0f}k",
             "-bufsize", "1M",
             "-b:a",f"{a_rate:.0f}k"]
+        + output_options # passthrough options.
         )
-    if scale_cmd:
-        command += scale_cmd.split()
-    command += [sys.argv[-1]] # output filename
-    # fmt: on
 
+    # fmt: on
+    output_file = output_options[-1]
     print(" ".join(command))
     subprocess.run(command, check=True)
-    return os.path.getsize(sys.argv[-1])
-
-
-if __name__ == "__main__":
-    size = TARGET_SIZE_NITRO if NITRO else TARGET_SIZE
-    generate_file_loop(generate_file, size)
+    return os.path.getsize(output_file)

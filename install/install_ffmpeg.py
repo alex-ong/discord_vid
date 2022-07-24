@@ -4,7 +4,8 @@ import subprocess
 from install.helpers import download_file
 
 FFMPEG_PATH = "./ffmpeg/"
-FFMPEG_EXE = FFMPEG_PATH + "ffmpeg.exe"
+FFMPEG_EXE = "ffmpeg/ffmpeg.exe"
+FFPROBE_EXE = "ffmpeg/ffprobe.exe"
 URL = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z"
 OUT_ZIP = "./ffmpeg/ffmpeg.7z"
 def install_ffmpeg(force=False):

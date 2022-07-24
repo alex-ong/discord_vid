@@ -4,19 +4,24 @@ discord vid libx264 implementation
 import sys
 import subprocess
 import os
-from discord_vid.disvid_lib import generate_file_loop, NITRO, scale_rate
+
 
 # These are defined here because different encoders
 # Have different overheads
 TARGET_FILE_SIZE = 8100
 TARGET_FILE_SIZE_NITRO = 48500
 
+def guess_target(max_size):
+    if max_size <= 9000:
+        return 1.02 * max_size
+    else:
+        return 0.97 * max_size
 
 def generate_file(v_rate, a_rate):
     """
     Generate file with libx264 2-pass options auto-injected
     """
-    scale_cmd = scale_rate()
+    
     # fmt: off
     command = ( #first pass
         "ffmpeg -y".split()
@@ -55,6 +60,3 @@ def generate_file(v_rate, a_rate):
     return os.path.getsize(sys.argv[-1])
 
 
-if __name__ == "__main__":
-    size = TARGET_FILE_SIZE_NITRO if NITRO else TARGET_FILE_SIZE
-    generate_file_loop(generate_file, size)
