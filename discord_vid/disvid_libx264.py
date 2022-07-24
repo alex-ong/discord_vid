@@ -41,7 +41,6 @@ def generate_file(v_rate, a_rate, options):
         
     
     # fmt: on
-
     print(" ".join(command))
     subprocess.run(command, check=True)
 

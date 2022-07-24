@@ -20,7 +20,6 @@ def convert(preset: str, filename):
     options = [input_options, output_options]
     has_nvidia = disvid_lib.check_nvidia()
     # choose encoder
-    has_nvidia = False
     if has_nvidia:
         size[1] = disvid_nvenc.guess_target(size[2])
         filename = os.path.splitext(filename)[0] + "_nvenc.mp4"
