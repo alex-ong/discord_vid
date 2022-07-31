@@ -4,7 +4,9 @@ from discord_vid.disvid_lib import (
 guess_encoder, 
 get_encoder_lib, 
 Encoder, 
-generate_file_loop
+generate_file_loop,
+bytes_to_mb,
+kb_to_mb
 )
 
 class Task:
@@ -32,4 +34,23 @@ class Task:
         filename = os.path.splitext(self.filename)[0] + self.encoder_lib.extension()
         options[1].append(filename)
         print(f"Converting {self.filename} using {self.preset.name}")
-        generate_file_loop(self.encoder_lib.generate_file, self.size, options)
+        generate_file_loop(self.encoder_lib.generate_file, self, options)
+
+    def on_encoder_finish(self, size, finished=False):
+        min_size, target_size, max_size = self.size
+        if size < min_size:
+            print("For some reason we got a REALLY low file size:")
+            print(
+                f"Actual: {bytes_to_mb(size)}\n" + f"Target {kb_to_mb(target_size)}"
+            )
+        elif size > max_size:
+            print(
+                "Uh oh, we're still over size.\n"
+                + f"Actual: {bytes_to_mb(size)}\n"
+                + f"Target supplied: {kb_to_mb(target_size)}"
+            )
+        else:
+            print(
+                f"Actual: {bytes_to_mb(size)}\n"
+                + f"Target supplied: {kb_to_mb(target_size)}"
+            )

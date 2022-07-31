@@ -51,8 +51,7 @@ def get_length(filename):
     """
     returns length of file in seconds
     """
-    # fmt: off
-    print(FFPROBE_EXE)
+    # fmt: off    
     result = subprocess.run(
         [
             FFPROBE_EXE, "-v", "error",
@@ -111,59 +110,43 @@ def get_bitrate(target_size, length, audio_rate):
     return bitrate
 
 
-def generate_file_loop(generate_file_func, target_size, options):
+def generate_file_loop(generate_file_func, task, options):
     """
     Used by each encoder type;
     they run this loop, supplying their file generation function
     and starting target file size.
     """
-    if len(sys.argv) < 2:
-        print(f"usage: {sys.argv[0]} <regular ffmpeg commands>")
-
-    input_options = options[0]
-    filename_index = input_options.index("-i") + 1
-    filename = input_options[filename_index]
+    
+    filename = task.filename
     audio_rate = get_audio_rate(options[1])
 
     print(f"Getting file:{filename}")
     length = get_length(filename)
     print(f"File length:{length} seconds")
     print(f"Estimated audio size: {audio_rate*length/8/1024:.0f}KB")
-
-    min_size, target_size, max_size = target_size
+    
+    min_size, target_size, max_size = task.size
     actual_size = generate_file_loop_iter(
         target_size, length, generate_file_func, options
     )
 
     if actual_size < min_size:
-        print(actual_size / min_size, actual_size, min_size)
-        print("For some reason we got a REALLY low file size:")
-        print(
-            f"Actual: {bytes_to_mb(actual_size)}\n" + f"Target {kb_to_mb(target_size)}"
-        )
+        task.on_encoder_finish(actual_size, False)
         target_size *= float(max_size) / (actual_size * 1.02)
-        print(f"New Target size: {kb_to_mb(target_size)}")
         actual_size = generate_file_loop_iter(
             target_size, length, generate_file_func, options
         )
 
     while actual_size > max_size:
-        print(
-            "Uh oh, we're still over size.\n"
-            + f"Actual: {bytes_to_mb(actual_size)}\n"
-            + f"Target supplied: {kb_to_mb(target_size)}"
-        )
+        task.on_encoder_finish(actual_size, False)
         target_size -= int(0.01 * max_size)
-        print(f"New Target: {kb_to_mb(target_size)}")
         actual_size = generate_file_loop_iter(
             target_size, length, generate_file_func, options
         )
 
-    print("all done:")
-    print(
-        f"Actual: {bytes_to_mb(actual_size)}\n"
-        + f"Target supplied: {kb_to_mb(target_size)}"
-    )
+    task.on_encoder_finish(actual_size, True)
+    
+    
 
 
 def kb_to_mb(value):
