@@ -6,7 +6,16 @@ import os
 import subprocess
 import sys
 from install.install_ffmpeg import FFPROBE_EXE
+from discord_vid import disvid_nvenc
+from discord_vid import disvid_libx264
 
+from enum import Enum
+
+class Encoder(Enum):
+    NVIDIA = 1
+    CPU = 2
+    INTEL = 3 #todo
+    AMD = 4 #todo
 
 def get_audio_rate(output_options):
     """
@@ -16,8 +25,13 @@ def get_audio_rate(output_options):
     audio_index = output_options.index("-b:a") + 1
     return int(output_options[audio_index].lower().replace("k", "")) * 1000
 
-
-def check_nvidia():
+def get_encoder_lib(encoder: Encoder):
+    if encoder == Encoder.NVIDIA:
+        return disvid_nvenc
+    else:
+        return disvid_libx264
+    
+def guess_encoder():
     """
     Checks if you have an nvidia gpu installed.
     """
@@ -28,9 +42,9 @@ def check_nvidia():
     items = [item.decode("utf-8") for item in items]
 
     if "nvidia" in items:
-        return True
+        return Encoder.NVIDIA
 
-    return False
+    return Encoder.CPU
 
 
 def get_length(filename):
@@ -186,8 +200,8 @@ def main():
     """
     main function for this program
     """
-    if "--check_nvidia" in sys.argv:
-        has_nvidia = check_nvidia()
+    if "--guess_encoder" in sys.argv:
+        has_nvidia = guess_encoder()
         print("We have NVIDIA!")
         sys.exit(0 if has_nvidia else 1)
 

@@ -11,6 +11,8 @@ from install.install_ffmpeg import FFMPEG_EXE
 # TARGET_SIZE = 7600
 # TARGET_SIZE_NITRO = 50*1024
 
+def extension():
+    return "_nvenc.mp4"
 
 def guess_target(max_size):
     """

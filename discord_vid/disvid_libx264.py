@@ -10,6 +10,8 @@ from install.install_ffmpeg import FFMPEG_EXE
 TARGET_FILE_SIZE = 8100
 TARGET_FILE_SIZE_NITRO = 48500
 
+def extension():
+    return "_libx264.mp4"
 
 def guess_target(max_size):
     """
