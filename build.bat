@@ -1,2 +1,2 @@
 pipenv install
-pipenv run pyinstaller main.spec
+pipenv run pyinstaller main.spec --noconfirm

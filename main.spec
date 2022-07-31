@@ -4,7 +4,8 @@
 block_cipher = None
 
 added_files = [	
-    ( 'ffmpeg/*', 'ffmpeg/' ),    
+    ( 'ffmpeg/*', 'ffmpeg/' ),
+	( 'data/*', 'data/')
 ]
 a = Analysis(
     ['main.py'],
@@ -28,7 +29,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='main',
+    name='dv',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -48,5 +49,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='main',
+    name='dv',
 )
