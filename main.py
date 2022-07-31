@@ -3,14 +3,19 @@ Main entrypoint to program.
 Use program with preset and file.
 """
 import sys
-from discord_vid import disvid
 from install import install_context
+from discord_vid import disvid
 from discord_vid.task import Task
 
+
 def convert(preset, path):
+    """
+    converts a preset and path to a task then executes it
+    """
     task = Task(preset, path)
     disvid.convert(task)
-    
+
+
 # pipenv run python -m discord_vid.disvid {PRESET} file.mp4
 if __name__ == "__main__":
     if "--install" in sys.argv:

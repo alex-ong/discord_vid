@@ -1,5 +1,5 @@
 """
-discord vid libx264 implementation
+discord vid nvenc implementation
 """
 import subprocess
 import os
@@ -11,8 +11,11 @@ from install.install_ffmpeg import FFMPEG_EXE
 # TARGET_SIZE = 7600
 # TARGET_SIZE_NITRO = 50*1024
 
+
 def extension():
+    """return file extension for file converted using this module"""
     return "_nvenc.mp4"
+
 
 def guess_target(max_size):
     """

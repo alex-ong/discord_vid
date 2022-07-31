@@ -49,7 +49,9 @@ def add_to_path(program_path: str):
                 ctypes.byref(result),
             )
     else:  # If system is *nix
-        with open(f"{os.getenv('HOME')}/.bashrc", "a") as bash_file:  # Open bashrc file
+        with open(
+            f"{os.getenv('HOME')}/.bashrc", "a", encoding="utf8"
+        ) as bash_file:  # Open bashrc file
             bash_file.write(
                 f'\nexport PATH="{program_path}:$PATH"\n'
             )  # Add program path to Path variable
@@ -77,5 +79,6 @@ def download_file(source: str, dest: str):
                 downloaded += len(data)
                 file.write(data)
                 done = int(50 * downloaded / total_length)
-                sys.stdout.write("\r[%s%s]" % ("=" * done, " " * (50 - done)))
+                done, not_done = "=" * done, " " * (50 - done)
+                sys.stdout.write(f"\r[{done}{not_done}]")
                 sys.stdout.flush()

@@ -5,17 +5,20 @@ import glob
 import os
 import subprocess
 import sys
+from enum import Enum
 from install.install_ffmpeg import FFPROBE_EXE
 from discord_vid import disvid_nvenc
 from discord_vid import disvid_libx264
 
-from enum import Enum
 
 class Encoder(Enum):
+    """Enum representing which encoder to use"""
+
     NVIDIA = 1
     CPU = 2
-    INTEL = 3 #todo
-    AMD = 4 #todo
+    INTEL = 3
+    AMD = 4
+
 
 def get_audio_rate(output_options):
     """
@@ -25,16 +28,17 @@ def get_audio_rate(output_options):
     audio_index = output_options.index("-b:a") + 1
     return int(output_options[audio_index].lower().replace("k", "")) * 1000
 
+
 def get_encoder_lib(encoder: Encoder):
+    """Converts from encoder enum to encoder library"""
     if encoder == Encoder.NVIDIA:
         return disvid_nvenc
-    else:
-        return disvid_libx264
-    
+
+    return disvid_libx264
+
+
 def guess_encoder():
-    """
-    Checks if you have an nvidia gpu installed.
-    """
+    """Checks if you have an nvidia gpu installed."""
 
     args = "wmic path win32_VideoController get name"
     result = subprocess.run(args.split(), capture_output=True, check=True)
@@ -51,7 +55,7 @@ def get_length(filename):
     """
     returns length of file in seconds
     """
-    # fmt: off    
+    # fmt: off
     result = subprocess.run(
         [
             FFPROBE_EXE, "-v", "error",
@@ -116,7 +120,7 @@ def generate_file_loop(generate_file_func, task, options):
     they run this loop, supplying their file generation function
     and starting target file size.
     """
-    
+
     filename = task.filename
     audio_rate = get_audio_rate(options[1])
 
@@ -124,7 +128,7 @@ def generate_file_loop(generate_file_func, task, options):
     length = get_length(filename)
     print(f"File length:{length} seconds")
     print(f"Estimated audio size: {audio_rate*length/8/1024:.0f}KB")
-    
+
     min_size, target_size, max_size = task.size
     actual_size = generate_file_loop_iter(
         target_size, length, generate_file_func, options
@@ -145,8 +149,6 @@ def generate_file_loop(generate_file_func, task, options):
         )
 
     task.on_encoder_finish(actual_size, True)
-    
-    
 
 
 def kb_to_mb(value):

@@ -58,10 +58,10 @@ def get_preset_options(preset: Preset):
     """
     if preset == Preset.EIGHT_MB_720P30:
         return (SIZE_8, ["-vf", "scale=-1:720", "-r", "30", "-b:a", "64k"])
-    elif preset == Preset.EIGHT_MB_720P60:
+    if preset == Preset.EIGHT_MB_720P60:
         return (SIZE_8, ["-vf", "scale=-1:720", "-r", "60", "-b:a", "64k"])
-    elif preset == Preset.FIFTY_MB_1080P30:
+    if preset == Preset.FIFTY_MB_1080P30:
         return (SIZE_50, ["-vf", "scale=-1:1080", "-r", "30", "-b:a", "128k"])
-    elif preset == Preset.FIFTY_MB_1080P60:
+    if preset == Preset.FIFTY_MB_1080P60:
         return (SIZE_50, ["-vf", "scale=-1:1080", "-r", "60", "-b:a", "128k"])
     return []

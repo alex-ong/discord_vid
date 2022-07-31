@@ -31,18 +31,19 @@ def get_latest_url():
 
     return candidates[0]
 
+
 def install_7z(force=False):
     """
     Installs 7z if not installed
     """
     is_installed = subprocess.call("where 7z")
     if is_installed != 0 or force:
-        download_7z()
+        download_7z(force)
 
 
-def download_7z():
+def download_7z(force=False):
     """Downloads and unzips 7zip"""
-    print("Installing 7zip")    
+    print("Installing 7zip")
     add_to_path(SEVEN_ZIP_INSTALL_PATH)
     os.environ["PATH"] += f";{SEVEN_ZIP_INSTALL_PATH};"
     is_installed = subprocess.call("where 7z")
@@ -56,6 +57,7 @@ def download_7z():
         subprocess.call([dest, "/S"], shell=True)
         is_installed = subprocess.call("where 7z")
         print(f"7zip on path: {is_installed}")
+
 
 # run as python -m install.install_7z
 if __name__ == "__main__":
