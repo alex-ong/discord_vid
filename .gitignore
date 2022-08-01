@@ -131,3 +131,4 @@ dmypy.json
 /.vs/
 /ffmpeg/
 /7z*.exe
+/data/USER_CONFIG.json

@@ -25,5 +25,6 @@
             "max_size_mb": 100.00,
             "args": ["-b:a", "128k" ]
         }
-    }
+    },
+    "default_preset": "8MB_720p30"
 }

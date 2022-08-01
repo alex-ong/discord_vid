@@ -2,7 +2,7 @@
 Basic task framework on ffmpeg tasks
 """
 import os
-from discord_vid.preset import Preset, get_preset_options
+from discord_vid.preset import get_preset_options
 from discord_vid.disvid_lib import (
     guess_encoder,
     get_encoder_lib,
@@ -17,7 +17,7 @@ class Task:
     """FFMPEG task"""
 
     def __init__(self, preset, filename):
-        self.preset = Preset.from_str(preset)
+        self.preset = preset
         self.filename = filename
         self.process = None
 
@@ -39,7 +39,7 @@ class Task:
         encoder_lib = get_encoder_lib(self.encoder)
         filename = os.path.splitext(self.filename)[0] + encoder_lib.extension()
         options[1].append(filename)
-        print(f"Converting {self.filename} using {self.preset.name}")
+        print(f"Converting {self.filename} using {self.preset}")
         generate_file_loop(encoder_lib.generate_file, self, options)
 
     def on_encoder_finish(self, size, finished=False):
