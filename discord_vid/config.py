@@ -1,6 +1,8 @@
 """
 Basic global config file.
 """
+import os
+import sys
 import json
 from collections import OrderedDict
 
@@ -9,6 +11,15 @@ USER_CONFIG = "data/USER_CONFIG.json"
 
 CONFIG = None
 
+def get_default_config_path():
+    folder = os.path.split(sys.argv[0])[0]
+    root = os.path.abspath(folder)
+    return root + "/" + DEFAULT_CONFIG
+
+def get_user_config_path():
+    folder = os.path.split(sys.argv[0])[0]
+    root = os.path.abspath(folder)
+    return root + "/" + USER_CONFIG
 
 def get_config():
     """lazily gets the config file"""
@@ -16,11 +27,14 @@ def get_config():
 
     if CONFIG is not None:
         return CONFIG
-    with open(DEFAULT_CONFIG, "r", encoding="utf8") as default_file:
+    default_config = get_default_config_path()
+    user_config = get_user_config_path()
+
+    with open(default_config, "r", encoding="utf8") as default_file:
         data = json.load(default_file, object_pairs_hook=OrderedDict)
 
     try:
-        with open(USER_CONFIG, "r", encoding="utf8") as user_file:
+        with open(user_config, "r", encoding="utf8") as user_file:
             data2 = json.load(user_file, object_pairs_hook=OrderedDict)
     except FileNotFoundError:
         data2 = {}
