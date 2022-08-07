@@ -8,6 +8,7 @@ from discord_vid import disvid
 from discord_vid.task import Task
 from discord_vid.preset import display_presets
 
+
 def convert(preset, path):
     """
     converts a preset and path to a task then executes it
@@ -33,4 +34,10 @@ if __name__ == "__main__":
         print(sys.argv[0] + " default file.mp4")
         input("Press enter to continue...")
         sys.exit()
-    convert(sys.argv[1], sys.argv[2])
+    try:
+        convert(sys.argv[1], sys.argv[2])
+    except Exception as error:
+        print(error)
+        input()
+        
+    
