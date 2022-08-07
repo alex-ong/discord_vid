@@ -3,10 +3,56 @@ Toolkit for adding shift+rightclick context menu
 """
 import os
 import sys
+from discord_vid.preset import get_presets
 
 INSTALL_SAMPLE = "data/sample_install.reg.bak"
 INSTALL_ACTUAL = "data/install.reg"
 UNINSTALL_ACTUAL = "data/uninstall.reg"
+
+def get_uninstall_header_string():
+    strings = [
+    "Windows Registry Editor Version 5.00" + "\n",
+    r"[-HKEY_CLASSES_ROOT\*\shell\DiscordVid]" "\n",
+    r"[-HKEY_CLASSES_ROOT\Directory\shell\DiscordVid]" "\n",
+    ]
+    return strings
+
+def get_header_string():
+    strings = [
+        r"Windows Registry Editor Version 5.00",
+        r"",
+        r"[HKEY_CLASSES_ROOT\*\shell\DiscordVid]",
+        r'"MUIVerb"="DiscordVid"',
+        r'"SubCommands"="DiscordVid.Default;DiscordVid.8MB_720p30;DiscordVid.8MB_720p60;DiscordVid.50MB_1080p30;DiscordVid.50MB_1080p60;DiscordVid.100MB"',
+        r'"Extended"=""',
+        r'"Icon"="{icon_path}"',
+        r"",
+        r"[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\DiscordVid.Default]",
+        r'"MUIVerb"="Compress (default)"',
+        r"[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\DiscordVid.Default\command]",
+        r'@="\"{exe_path}\" \"default\" \"%1\""',
+        r"",
+    ]
+    return "\n".join(strings)
+
+
+
+def get_preset_string(quality: str, exe_path: str):
+
+    quality_readable = quality.replace("_", " ")
+    preset_name = f"DiscordVid.{quality}"
+    line1 = r"[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell" + '\\'
+    line1 += preset_name + "]\n"
+    line2 = r'"MUIVerb"="Compress to ' + quality_readable + '"\n'
+
+    line3 = r"[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\DiscordVid." + f"{quality}" + r"\command]" + "\n"
+    line4 = r'@="\"' + exe_path + r'\" \"' + quality + r'\" \"%1\""' + "\n"
+
+    preset = [line1, line2, line3, line4]
+    
+    uninstall_line = "[-" + line1[1:]
+
+    return [preset, uninstall_line]
 
 
 def get_install_path():
@@ -32,21 +78,28 @@ def generate_context():
     """
     Generates a context installation file
     """
-    lines = []
+
     exe = get_install_exe()
     icon = get_install_ico()
-    with open(INSTALL_SAMPLE, "r", encoding="utf8") as file:
-        for line in file:
-            line = line.replace("{exe_path}", exe)
-            line = line.replace("{icon_path}", icon)
-            lines.append(line)
 
-    for line in lines:
-        print(line.strip())
+    header = get_header_string()
+    header = header.replace("{exe_path}", exe)
+    header = header.replace("{icon_path}", icon)
+
+    preset_lines = []
+    uninstall_lines = []
+    for preset in get_presets():
+        preset_line, uninstall_line = get_preset_string(preset, exe)
+        preset_lines.extend(preset_line)
+        uninstall_lines.append(uninstall_line)
 
     with open(INSTALL_ACTUAL, "w", encoding="utf8") as file:
-        file.writelines(lines)
-
+        file.write(header)
+        file.writelines(preset_lines)
+    
+    with open(UNINSTALL_ACTUAL, "w", encoding="utf8") as file:
+        file.writelines(get_uninstall_header_string())
+        file.writelines(uninstall_lines)
 
 def install_context():
     """
