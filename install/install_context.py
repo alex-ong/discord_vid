@@ -1,11 +1,11 @@
 """
 Toolkit for adding shift+rightclick context menu
 """
+from cgi import print_directory
 import os
 import sys
 from discord_vid.preset import get_presets
 
-INSTALL_SAMPLE = "data/sample_install.reg.bak"
 INSTALL_ACTUAL = "data/install.reg"
 UNINSTALL_ACTUAL = "data/uninstall.reg"
 
@@ -110,7 +110,9 @@ def install_context():
         "After completion, hold shift and right click a video"
         + " then select DiscordVid submenu to convert easily"
     )
-    input("Press enter to continue. Press *No* if you don't want a context menu")
+    print("Press *Yes* to install context menu")
+    print("="*10)
+    input("Press enter to continue.")
     os.startfile(get_install_path() + "/" + INSTALL_ACTUAL)
 
 
@@ -121,7 +123,9 @@ def uninstall_context():
     print(
         "We are going to de-install a registry shortcut that previously enabled right click menu"
     )
-    input("Press enter to continue. Press *Yes* to uninstall")
+    print("Press *Yes* to uninstall")
+    print("="*10)
+    input("Press enter to continue.")
     os.startfile(get_install_path() + "/" + UNINSTALL_ACTUAL)
 
 
