@@ -48,7 +48,8 @@ def get_config():
 
 def save_config(data):
     """saves the config file"""
-    with open(USER_CONFIG, "w", encoding="utf8") as config:
+    user_config = get_user_config_path()
+    with open(user_config, "w", encoding="utf8") as config:
         json.dump(data, config, indent=4)
 
 
