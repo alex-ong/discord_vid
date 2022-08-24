@@ -3,7 +3,7 @@ Task status frame
 """
 
 import tkinter as tk
-import tkinter.ttk as ttk
+from tkinter import ttk
 from gui.task_args import TaskArgs
 from discord_vid.task import Task
 
@@ -40,6 +40,6 @@ class TaskStatus(tk.Frame):
         """Callback for when the task updates"""
         self.progress_bar.percent = update.percent
 
-    def on_task_stop(self, event):
+    def on_task_stop(self, _):
         """triggered when the user cancels the task"""
         self.task.cancel()  # should end up calling task_update(error)

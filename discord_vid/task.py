@@ -27,8 +27,10 @@ class Task:
         self.input_options = ["-i", filename]
         self.encoder = guess_encoder()
         self.set_encoder(self.encoder)
+        self.on_update_cb = None
 
     def set_on_update(self, callback):
+        """register the update callback"""
         self.on_update_cb = callback
 
     def set_encoder(self, encoder: Encoder):

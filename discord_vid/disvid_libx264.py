@@ -2,7 +2,6 @@
 discord vid libx264 implementation
 """
 
-import glob
 import os
 from install.install_ffmpeg import FFMPEG_EXE
 
@@ -50,7 +49,7 @@ def generate_file_cmd(v_rate, a_rate, options):
         + f"-passlogfile {output_file}".split()
         + ["NUL"]
         )
-    
+
     command2 = ( #second pass
         [FFMPEG_EXE, "-y"]
         + input_options

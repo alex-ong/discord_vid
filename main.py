@@ -8,7 +8,10 @@ from discord_vid import disvid
 from discord_vid.task import Task
 from discord_vid.preset import display_presets
 
-from gui.main_gui import main, get_gui
+from gui.main_gui import (
+    # main,
+    get_gui,
+)
 
 
 def halt_on_exception(exception_type, value, traceback, oldhook=sys.excepthook):

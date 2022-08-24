@@ -1,8 +1,6 @@
 """
 discord vid nvenc implementation
 """
-import subprocess
-import os
 
 from install.install_ffmpeg import FFMPEG_EXE
 
