@@ -28,6 +28,8 @@ class Task:
         self.encoder = guess_encoder()
         self.set_encoder(self.encoder)
         self.on_update_cb = None
+        self.video_length = None
+        self.current_options = None  # options of currently running task
 
     def set_on_update(self, callback):
         """register the update callback"""
@@ -38,29 +40,34 @@ class Task:
         encoder_lib = get_encoder_lib(encoder)
         self.size[1] = encoder_lib.guess_target(self.size[2])
 
+    def set_video_length(self, seconds):
+        """Sets the video's length"""
+        self.video_length = seconds
+
     def generate_file(self):
         """generates the file by calling generate_file_loop"""
         options = [self.input_options, self.output_options[:]]
         encoder_lib = get_encoder_lib(self.encoder)
         filename = os.path.splitext(self.filename)[0] + encoder_lib.extension()
         options[1].append(filename)
+        self.current_options = options
         print(f"Converting {self.filename} using {self.preset}")
-        generate_file_loop(encoder_lib.generate_file_cmd, self, options)
+        generate_file_loop(encoder_lib.generate_file_cmd, self)
 
     def on_encoder_finish(self, size, finished=False):
         """callback for when encoder finishes"""
         min_size, target_size, max_size = self.size
-        if size < min_size:
+        if finished:
+            print(
+                f"Actual: {bytes_to_mb(size)}\n"
+                + f"Target supplied: {kb_to_mb(target_size)}"
+            )
+        elif size < min_size:
             print("For some reason we got a REALLY low file size:")
             print(f"Actual: {bytes_to_mb(size)}\n" + f"Target {kb_to_mb(target_size)}")
         elif size > max_size:
             print(
                 "Uh oh, we're still over size.\n"
                 + f"Actual: {bytes_to_mb(size)}\n"
-                + f"Target supplied: {kb_to_mb(target_size)}"
-            )
-        if finished:
-            print(
-                f"Actual: {bytes_to_mb(size)}\n"
                 + f"Target supplied: {kb_to_mb(target_size)}"
             )

@@ -40,6 +40,7 @@ def generate_file_cmd(v_rate, a_rate, options):
     # fmt: off
     command1 = ( #first pass
         [FFMPEG_EXE,  "-y"]
+        + "-v quiet -stats".split()
         + input_options
         + "-threads 8 -speed 4 -row-mt 1 -tile-columns 2 -vsync cfr".split()
         + f"-b:v {v_rate:.0f}k -minrate {v_rate/2:.0f}k".split()
@@ -52,6 +53,7 @@ def generate_file_cmd(v_rate, a_rate, options):
 
     command2 = ( #second pass
         [FFMPEG_EXE, "-y"]
+        + "-v quiet -stats".split()
         + input_options
         + f"-b:v {v_rate:.0f}k -minrate {v_rate/2:.0f}k".split()
         + f"-maxrate {v_rate*1.5:.0f}k -bufsize 1M".split()

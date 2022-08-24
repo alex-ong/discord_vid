@@ -35,6 +35,7 @@ def generate_file_cmd(v_rate, a_rate, options):
     # fmt: off
     command = (
         [FFMPEG_EXE, "-y"]
+        + "-v quiet -stats".split()
         + input_options
         + [ "-b:v", f"{v_rate:.0f}k", "-maxrate", f"{v_rate*1.5:.0f}k",
             "-minrate", f"{v_rate:.0f}k",

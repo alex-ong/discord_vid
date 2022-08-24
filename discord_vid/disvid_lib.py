@@ -98,39 +98,26 @@ def get_bitrate(target_size, length, audio_rate):
     return bitrate
 
 
-def generate_file_loop(generate_file_func, task, options):
+def generate_file_loop(generate_file_func, task):
     """
     Used by each encoder type;
     they run this loop, supplying their file generation function
     and starting target file size.
     """
 
-    filename = task.filename
-    audio_rate = get_audio_rate(options[1])
-
-    print(f"Getting file:{filename}")
-    length = get_length(filename)
-    print(f"File length:{length} seconds")
-    print(f"Estimated audio size: {audio_rate*length/8/1024:.0f}KB")
+    length = get_length(task.filename)
+    task.set_video_length(length)
 
     min_size, target_size, max_size = task.size
-    actual_size = generate_file_loop_iter(
-        target_size, length, generate_file_func, options
-    )
+    actual_size = file_loop_iter(target_size, generate_file_func, task)
 
     if actual_size < min_size:
-        task.on_encoder_finish(actual_size, False)
         target_size *= float(max_size) / (actual_size * 1.02)
-        actual_size = generate_file_loop_iter(
-            target_size, length, generate_file_func, options
-        )
+        actual_size = file_loop_iter(target_size, generate_file_func, task)
 
     while actual_size > max_size:
-        task.on_encoder_finish(actual_size, False)
         target_size -= int(0.01 * max_size)
-        actual_size = generate_file_loop_iter(
-            target_size, length, generate_file_func, options
-        )
+        actual_size = file_loop_iter(target_size, generate_file_func, task)
 
     task.on_encoder_finish(actual_size, True)
 
@@ -149,26 +136,56 @@ def bytes_to_mb(value):
     return value / 1024 / 1024.0
 
 
-def generate_file_loop_iter(target_size, length, func, options):
+def file_loop_iter(target_size, ffmpeg_command_gen, task):
+    """
+    Generates ffmpeg commands and cleanup functions to run, then runs them.
+    """
+    commands, output_file, cleanup = generate_file_loop_iter(
+        target_size, ffmpeg_command_gen, task
+    )
+    return execute_file_loop_iter(commands, output_file, cleanup, task.on_update_cb)
+
+
+def generate_file_loop_iter(target_size, ffmpeg_command_gen, task):
     """
     one loop of the file generation process
     """
-    audio_rate = get_audio_rate(options[1])
-    bitrate = get_bitrate(target_size, length, audio_rate)
+    audio_rate = get_audio_rate(task.current_options[1])
+    bitrate = get_bitrate(target_size, task.video_length, audio_rate)
 
     if bitrate < 0:
-        print("Unfortunately there is not enough bits for video!")
-        print(f"Bitrate: {bitrate}, Target: {target_size}mb")
-        sys.exit()
+        raise ValueError("Not enough bits for video")
 
-    commands, output_file, cleanup = func(bitrate, audio_rate, options)
+    return ffmpeg_command_gen(bitrate, audio_rate, task.current_options)
+
+
+def execute_file_loop_iter(commands, output_file, cleanup, on_update):
+    """
+    Executes a set of ffmpeg commands, and the cleanup functions.
+    Calls on_update while ffmpeg is running
+    """
     for command in commands:
+        run_ffmpeg_with_status(command, on_update)
         subprocess.run(command, check=True)
 
     if cleanup is not None:
         cleanup(output_file)
 
     return os.path.getsize(output_file)
+
+
+def run_ffmpeg_with_status(command, callback):
+    """Runs ffmpeg, calling callback with the percentage"""
+    with subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True,
+    ) as process:
+        for line in process.stdout:
+            print(line)
+
+        process.communicate()
 
 
 def main():
