@@ -26,9 +26,9 @@ def guess_target(max_size):
     return 0.98 * max_size
 
 
-def generate_file(v_rate, a_rate, options):
+def generate_file_cmd(v_rate, a_rate, options):
     """
-    Generate file with nvenc options auto-injected
+    Generates subprocess command to run, and the output filename.
     """
 
     input_options, output_options = options
@@ -47,6 +47,4 @@ def generate_file(v_rate, a_rate, options):
 
     # fmt: on
     output_file = output_options[-1]
-    print(" ".join(command))
-    subprocess.run(command, check=True)
-    return os.path.getsize(output_file)
+    return ([command], output_file, None)

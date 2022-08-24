@@ -28,6 +28,9 @@ class Task:
         self.encoder = guess_encoder()
         self.set_encoder(self.encoder)
 
+    def set_on_update(self, callback):
+        self.on_update_cb = callback
+
     def set_encoder(self, encoder: Encoder):
         """sets encoder and target starting size"""
         encoder_lib = get_encoder_lib(encoder)
@@ -40,7 +43,7 @@ class Task:
         filename = os.path.splitext(self.filename)[0] + encoder_lib.extension()
         options[1].append(filename)
         print(f"Converting {self.filename} using {self.preset}")
-        generate_file_loop(encoder_lib.generate_file, self, options)
+        generate_file_loop(encoder_lib.generate_file_cmd, self, options)
 
     def on_encoder_finish(self, size, finished=False):
         """callback for when encoder finishes"""

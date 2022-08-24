@@ -11,15 +11,18 @@ USER_CONFIG = "data/USER_CONFIG.json"
 
 CONFIG = None
 
+
 def get_default_config_path():
     folder = os.path.split(sys.argv[0])[0]
     root = os.path.abspath(folder)
     return root + "/" + DEFAULT_CONFIG
 
+
 def get_user_config_path():
     folder = os.path.split(sys.argv[0])[0]
     root = os.path.abspath(folder)
     return root + "/" + USER_CONFIG
+
 
 def get_config():
     """lazily gets the config file"""

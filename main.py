@@ -8,17 +8,33 @@ from discord_vid import disvid
 from discord_vid.task import Task
 from discord_vid.preset import display_presets
 
+from gui.main_gui import main, get_gui
+
+
+def halt_on_exception(exception_type, value, traceback, oldhook=sys.excepthook):
+    """Whenever there is a exception, require user to press enter"""
+    oldhook(exception_type, value, traceback)
+    print("=" * 20)
+    input("Please copy the error and report to the developer")
+
+
+# sys.excepthook = halt_on_exception
+
 
 def convert(preset, path):
     """
     converts a preset and path to a task then executes it
     """
     task = Task(preset, path)
+    gui = get_gui()
+    if gui is not None:
+        gui.add_task(task)
     disvid.convert(task)
 
 
 # pipenv run python -m discord_vid.disvid {PRESET} file.mp4
 if __name__ == "__main__":
+    # main() #uncomment to enable gui
     if "--install" in sys.argv:
         install_context.generate_context()
         print("Generated installer in data/install.reg")
@@ -34,10 +50,5 @@ if __name__ == "__main__":
         print(sys.argv[0] + " default file.mp4")
         input("Press enter to continue...")
         sys.exit()
-    try:
-        convert(sys.argv[1], sys.argv[2])
-    except Exception as error:
-        print(error)
-        input()
-        
-    
+
+    convert(sys.argv[1], sys.argv[2])

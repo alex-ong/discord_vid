@@ -32,10 +32,12 @@ def get_preset_options(preset: str):
         raise ValueError("Invalid preset: {preset}")
     return presetdata_to_options(presets[preset])
 
+
 def get_presets():
     """ Return list of preset names """
     config = get_config()
     return config["presets"].keys()
+
 
 def display_presets():
     """ Prints out preset names """

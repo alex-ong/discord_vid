@@ -132,3 +132,4 @@ dmypy.json
 /ffmpeg/
 /7z*.exe
 /data/USER_CONFIG.json
+/.vscode/settings.json

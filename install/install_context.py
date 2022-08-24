@@ -9,13 +9,15 @@ from discord_vid.preset import get_presets
 INSTALL_ACTUAL = "data/install.reg"
 UNINSTALL_ACTUAL = "data/uninstall.reg"
 
+
 def get_uninstall_header_string():
     strings = [
-    "Windows Registry Editor Version 5.00" + "\n",
-    r"[-HKEY_CLASSES_ROOT\*\shell\DiscordVid]" "\n",
-    r"[-HKEY_CLASSES_ROOT\Directory\shell\DiscordVid]" "\n",
+        "Windows Registry Editor Version 5.00" + "\n",
+        r"[-HKEY_CLASSES_ROOT\*\shell\DiscordVid]" "\n",
+        r"[-HKEY_CLASSES_ROOT\Directory\shell\DiscordVid]" "\n",
     ]
     return strings
+
 
 def get_header_string():
     strings = [
@@ -36,20 +38,27 @@ def get_header_string():
     return "\n".join(strings)
 
 
-
 def get_preset_string(quality: str, exe_path: str):
 
     quality_readable = quality.replace("_", " ")
     preset_name = f"DiscordVid.{quality}"
-    line1 = r"[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell" + '\\'
+    line1 = (
+        r"[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell"
+        + "\\"
+    )
     line1 += preset_name + "]\n"
     line2 = r'"MUIVerb"="Compress to ' + quality_readable + '"\n'
 
-    line3 = r"[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\DiscordVid." + f"{quality}" + r"\command]" + "\n"
-    line4 = r'@="\"' + exe_path + r'\" \"' + quality + r'\" \"%1\""' + "\n"
+    line3 = (
+        r"[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\DiscordVid."
+        + f"{quality}"
+        + r"\command]"
+        + "\n"
+    )
+    line4 = r'@="\"' + exe_path + r"\" \"" + quality + r'\" \"%1\""' + "\n"
 
     preset = [line1, line2, line3, line4]
-    
+
     uninstall_line = "[-" + line1[1:]
 
     return [preset, uninstall_line]
@@ -96,10 +105,11 @@ def generate_context():
     with open(INSTALL_ACTUAL, "w", encoding="utf8") as file:
         file.write(header)
         file.writelines(preset_lines)
-    
+
     with open(UNINSTALL_ACTUAL, "w", encoding="utf8") as file:
         file.writelines(get_uninstall_header_string())
         file.writelines(uninstall_lines)
+
 
 def install_context():
     """
@@ -111,7 +121,7 @@ def install_context():
         + " then select DiscordVid submenu to convert easily"
     )
     print("Press *Yes* to install context menu")
-    print("="*10)
+    print("=" * 10)
     input("Press enter to continue.")
     os.startfile(get_install_path() + "/" + INSTALL_ACTUAL)
 
@@ -124,7 +134,7 @@ def uninstall_context():
         "We are going to de-install a registry shortcut that previously enabled right click menu"
     )
     print("Press *Yes* to uninstall")
-    print("="*10)
+    print("=" * 10)
     input("Press enter to continue.")
     os.startfile(get_install_path() + "/" + UNINSTALL_ACTUAL)
 
