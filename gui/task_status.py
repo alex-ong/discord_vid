@@ -19,8 +19,8 @@ class TaskStatus(tk.Frame):
         self.title = tk.Label(self, text="file name")
         self.title.grid()
 
-        self.progress_bar = ttk.Progressbar(self, length=PROGRESS_LENGTH)
-        self.progress_bar.grid()  # todo
+        self.progress_bar = ttk.Progressbar(self, length=PROGRESS_LENGTH,maximum=100)
+        self.progress_bar.grid()
 
         self.task_args = TaskArgs(self)
         self.task_args.grid()
@@ -40,7 +40,7 @@ class TaskStatus(tk.Frame):
     def on_task_update(self, seconds_processed):
         """Callback for when the task updates"""
         print(seconds_processed)
-        self.progress_bar.percent = seconds_processed / self.task.video_length
+        self.progress_bar['value'] = seconds_processed / self.task.video_length * 100
 
     def on_task_stop(self, _):
         """triggered when the user cancels the task"""

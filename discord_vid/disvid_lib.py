@@ -212,7 +212,6 @@ def run_ffmpeg_with_status(command, callback):
             try:
                 line = queue.get_nowait()  # or q.get(timeout=.1)
             except Empty:
-                time.sleep(1)
                 continue
             else:  # got line
                 if not line.startswith("frame") or callback is None:
