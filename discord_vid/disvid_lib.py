@@ -2,10 +2,14 @@
 A bunch of useful library functions
 """
 from datetime import timedelta, datetime
+from threading import Thread
 import os
 import subprocess
 import sys
 from enum import Enum
+import time
+from queue import Queue, Empty
+
 from install.install_ffmpeg import FFPROBE_EXE
 from discord_vid import disvid_nvenc
 from discord_vid import disvid_libx264
@@ -99,6 +103,13 @@ def get_bitrate(target_size, length, audio_rate):
     return bitrate
 
 
+def generate_file_loop_threaded(generate_file_func, task):
+    """runs generate_file_loop in background thread"""
+    thread = Thread(target=generate_file_loop, args=(generate_file_func, task))
+    thread.start()
+    print("mainthread?")
+
+
 def generate_file_loop(generate_file_func, task):
     """
     Used by each encoder type;
@@ -176,34 +187,51 @@ def execute_file_loop_iter(commands, output_file, cleanup, on_update):
     return os.path.getsize(output_file)
 
 
+def enqueue_output(out, queue):
+    """enqueues a line from the process to the queue"""
+    for line in out:
+        queue.put(line)
+    out.close()
+
+
 def run_ffmpeg_with_status(command, callback):
     """Runs ffmpeg, calling callback with the percentage"""
+    print(command)
+    queue = Queue()
     with subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         universal_newlines=True,
+        bufsize=1,
     ) as process:
-        print(command)
-        for line in process.stdout:
-            if not line.startswith("frame") or callback is None:
+        thread = Thread(target=enqueue_output, args=(process.stdout, queue))
+        thread.daemon = True
+        thread.start()
+        while thread.is_alive():
+            try:
+                line = queue.get_nowait()  # or q.get(timeout=.1)
+            except Empty:
+                time.sleep(1)
                 continue
-            pairs = line.split()
-            time_str = [pair for pair in pairs if pair.startswith("time")][0]
-            time_str = time_str.split("=")[1]  # 00:00:00.000
-            if time_str.startswith("-"):  # negative time fix
-                continue
-            date_time = datetime.strptime(time_str.split(".")[0], "%H:%M:%S")
-            milliseconds = float(time_str.split(".")[1]) * 10
-            delta = timedelta(
-                hours=date_time.hour,
-                minutes=date_time.minute,
-                seconds=date_time.second,
-                milliseconds=milliseconds,
-            )
-            callback(delta)
-
-        process.wait()
+            else:  # got line
+                if not line.startswith("frame") or callback is None:
+                    continue
+                pairs = line.split()
+                time_str = [pair for pair in pairs if pair.startswith("time")][0]
+                time_str = time_str.split("=")[1]  # 00:00:00.000
+                if time_str.startswith("-"):  # negative time fix
+                    continue
+                date_time = datetime.strptime(time_str.split(".")[0], "%H:%M:%S")
+                milliseconds = float(time_str.split(".")[1]) * 10
+                delta = timedelta(
+                    hours=date_time.hour,
+                    minutes=date_time.minute,
+                    seconds=date_time.second,
+                    milliseconds=milliseconds,
+                )
+                callback(delta.total_seconds())
+        thread.join()
 
 
 def main():

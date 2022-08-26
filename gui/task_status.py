@@ -35,10 +35,12 @@ class TaskStatus(tk.Frame):
         self.task = task
         self.title["text"] = task.filename
         self.task_args.set_task(task)
+        task.set_on_update(self.on_task_update)
 
-    def on_task_update(self, update):
+    def on_task_update(self, seconds_processed):
         """Callback for when the task updates"""
-        self.progress_bar.percent = update.percent
+        print(seconds_processed)
+        self.progress_bar.percent = seconds_processed / self.task.video_length
 
     def on_task_stop(self, _):
         """triggered when the user cancels the task"""
