@@ -178,8 +178,8 @@ def execute_file_loop_iter(commands, output_file, cleanup, on_update):
     Executes a set of ffmpeg commands, and the cleanup functions.
     Calls on_update while ffmpeg is running
     """
-    for command in commands:
-        run_ffmpeg_with_status(command, on_update)
+    for index, command in enumerate(commands):
+        run_ffmpeg_with_status(command, on_update, (index, len(commands)))
 
     if cleanup is not None:
         cleanup(output_file)
@@ -194,7 +194,7 @@ def enqueue_output(out, queue):
     out.close()
 
 
-def run_ffmpeg_with_status(command, callback):
+def run_ffmpeg_with_status(command, callback, subtask_id):
     """Runs ffmpeg, calling callback with the percentage"""
     print(command)
     queue = Queue()
@@ -214,23 +214,32 @@ def run_ffmpeg_with_status(command, callback):
             except Empty:
                 continue
             else:  # got line
-                if not line.startswith("frame") or callback is None:
+                if callback is None:
                     continue
-                pairs = line.split()
-                time_str = [pair for pair in pairs if pair.startswith("time")][0]
-                time_str = time_str.split("=")[1]  # 00:00:00.000
-                if time_str.startswith("-"):  # negative time fix
-                    continue
-                date_time = datetime.strptime(time_str.split(".")[0], "%H:%M:%S")
-                milliseconds = float(time_str.split(".")[1]) * 10
-                delta = timedelta(
-                    hours=date_time.hour,
-                    minutes=date_time.minute,
-                    seconds=date_time.second,
-                    milliseconds=milliseconds,
-                )
-                callback(delta.total_seconds())
+                progress_seconds = parse_time_line(line)
+                if progress_seconds is not None:
+                    callback(progress_seconds, subtask_id)
         thread.join()
+
+
+def parse_time_line(line):
+    """converts ffmpeg status line to time in seconds"""
+    if not line.startswith("frame"):
+        return None
+    pairs = line.split()
+    time_str = [pair for pair in pairs if pair.startswith("time")][0]
+    time_str = time_str.split("=")[1]  # 00:00:00.000
+    if time_str.startswith("-"):  # negative time fix
+        return None
+    date_time = datetime.strptime(time_str.split(".")[0], "%H:%M:%S")
+    milliseconds = float(time_str.split(".")[1]) * 10
+    delta = timedelta(
+        hours=date_time.hour,
+        minutes=date_time.minute,
+        seconds=date_time.second,
+        milliseconds=milliseconds,
+    )
+    return delta.total_seconds()
 
 
 def main():

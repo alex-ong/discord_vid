@@ -12,11 +12,6 @@ from discord_vid.disvid_lib import (
 )
 
 
-def print_actual_and_target(actual, target):
-    """prints the actual and target filesizes"""
-    print(f"Actual: {actual}\n" + f"Target: {target}")
-
-
 class Task:
     """FFMPEG task"""
 
@@ -32,12 +27,17 @@ class Task:
         self.encoder = guess_encoder()
         self.set_encoder(self.encoder)
         self.on_update_cb = None
+        self.on_finish_cb = None
         self.video_length = None
         self.current_options = None  # options of currently running task
 
     def set_on_update(self, callback):
         """register the update callback"""
         self.on_update_cb = callback
+
+    def set_on_finish(self, callback):
+        """register the finish callback"""
+        self.on_finish_cb = callback
 
     def set_encoder(self, encoder: Encoder):
         """sets encoder and target starting size"""
@@ -64,10 +64,13 @@ class Task:
         target_size = bytes_to_mb(target_size)
         output_size = bytes_to_mb(output_size)
         min_size, _, max_size = size
+
         if finished:
-            pass
+            message = f"Finished: {output_size:.2f}"
         elif output_size < min_size:
-            print("For some reason we got a REALLY low file size:")
+            message = f"Too small: {output_size:.2f}"
         elif output_size > max_size:
-            print("We are over the filesize limit.\n")
-        print_actual_and_target(output_size, target_size)
+            message = f"Too big: {output_size:.2f}"
+
+        if self.on_finish_cb is not None:
+            self.on_finish_cb(finished, message)

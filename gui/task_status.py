@@ -7,6 +7,10 @@ from tkinter import ttk
 from gui.task_args import TaskArgs
 from discord_vid.task import Task
 
+# style = ttk.Style()
+# style.theme_use('clam')
+# style.configure("red.Horizontal.TProgressbar", foreground='red', background='red')
+
 PROGRESS_LENGTH = 280
 
 
@@ -19,7 +23,7 @@ class TaskStatus(tk.Frame):
         self.title = tk.Label(self, text="file name")
         self.title.grid()
 
-        self.progress_bar = ttk.Progressbar(self, length=PROGRESS_LENGTH,maximum=100)
+        self.progress_bar = self.create_progressbar()
         self.progress_bar.grid()
 
         self.task_args = TaskArgs(self)
@@ -30,17 +34,33 @@ class TaskStatus(tk.Frame):
         self.task_root = None  # todo
         self.task = None  # todo
 
+    def create_progressbar(self):
+        """creates a new progressbar"""
+        return ttk.Progressbar(self, length=PROGRESS_LENGTH, maximum=100)
+
     def set_task(self, task: Task):
         """Sets the active task for this gui element"""
         self.task = task
         self.title["text"] = task.filename
         self.task_args.set_task(task)
         task.set_on_update(self.on_task_update)
+        task.set_on_finish(self.on_task_finish)
 
-    def on_task_update(self, seconds_processed):
+    def on_task_update(self, seconds_processed, subtask_count):
         """Callback for when the task updates"""
-        print(seconds_processed)
-        self.progress_bar['value'] = seconds_processed / self.task.video_length * 100
+        current_task, num_subtasks = subtask_count
+        perc = seconds_processed / self.task.video_length * 100 / num_subtasks
+        self.progress_bar["value"] = (current_task * 100.0 / num_subtasks) + perc
+
+    def on_task_finish(self, finished, message):
+        """updates progressbar color when the task is finished"""
+        self.progress_bar["value"] = 100
+        if finished:
+            pass
+        else:
+            # self.progress_bar['style'] = "red.Horizontal.TProgressbar"
+            self.progress_bar = self.create_progressbar()
+            self.progress_bar.grid()
 
     def on_task_stop(self, _):
         """triggered when the user cancels the task"""

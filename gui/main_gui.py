@@ -5,6 +5,7 @@ main gui for the program
 import tkinter as tk
 from gui.task_status import TaskStatus
 
+
 MAIN_APP = None
 MAIN_GUI = None
 
