@@ -9,8 +9,12 @@ from discord_vid.disvid_lib import (
     Encoder,
     generate_file_loop,
     bytes_to_mb,
-    kb_to_mb,
 )
+
+
+def print_actual_and_target(actual, target):
+    """prints the actual and target filesizes"""
+    print(f"Actual: {actual}\n" + f"Target: {target}")
 
 
 class Task:
@@ -54,20 +58,16 @@ class Task:
         print(f"Converting {self.filename} using {self.preset}")
         generate_file_loop(encoder_lib.generate_file_cmd, self)
 
-    def on_encoder_finish(self, size, finished=False):
+    def on_encoder_finish(self, output_size, target_size, finished=False):
         """callback for when encoder finishes"""
-        min_size, target_size, max_size = self.size
+        size = (bytes_to_mb(item) for item in self.size)
+        target_size = bytes_to_mb(target_size)
+        output_size = bytes_to_mb(output_size)
+        min_size, _, max_size = size
         if finished:
-            print(
-                f"Actual: {bytes_to_mb(size)}\n"
-                + f"Target supplied: {kb_to_mb(target_size)}"
-            )
-        elif size < min_size:
+            pass
+        elif output_size < min_size:
             print("For some reason we got a REALLY low file size:")
-            print(f"Actual: {bytes_to_mb(size)}\n" + f"Target {kb_to_mb(target_size)}")
-        elif size > max_size:
-            print(
-                "Uh oh, we're still over size.\n"
-                + f"Actual: {bytes_to_mb(size)}\n"
-                + f"Target supplied: {kb_to_mb(target_size)}"
-            )
+        elif output_size > max_size:
+            print("We are over the filesize limit.\n")
+        print_actual_and_target(output_size, target_size)

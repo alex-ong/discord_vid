@@ -1,6 +1,7 @@
 """
 A bunch of useful library functions
 """
+from datetime import timedelta, datetime
 import os
 import subprocess
 import sys
@@ -112,14 +113,16 @@ def generate_file_loop(generate_file_func, task):
     actual_size = file_loop_iter(target_size, generate_file_func, task)
 
     if actual_size < min_size:
+        task.on_encoder_finish(actual_size, target_size, False)
         target_size *= float(max_size) / (actual_size * 1.02)
         actual_size = file_loop_iter(target_size, generate_file_func, task)
 
     while actual_size > max_size:
+        task.on_encoder_finish(actual_size, target_size, False)
         target_size -= int(0.01 * max_size)
         actual_size = file_loop_iter(target_size, generate_file_func, task)
 
-    task.on_encoder_finish(actual_size, True)
+    task.on_encoder_finish(actual_size, target_size, True)
 
 
 def kb_to_mb(value):
@@ -133,7 +136,7 @@ def bytes_to_mb(value):
     """
     Converts bytes to Mebibytes
     """
-    return value / 1024 / 1024.0
+    return value / 1024.0 / 1024.0
 
 
 def file_loop_iter(target_size, ffmpeg_command_gen, task):
@@ -166,7 +169,6 @@ def execute_file_loop_iter(commands, output_file, cleanup, on_update):
     """
     for command in commands:
         run_ffmpeg_with_status(command, on_update)
-        subprocess.run(command, check=True)
 
     if cleanup is not None:
         cleanup(output_file)
@@ -182,10 +184,26 @@ def run_ffmpeg_with_status(command, callback):
         stderr=subprocess.STDOUT,
         universal_newlines=True,
     ) as process:
+        print(command)
         for line in process.stdout:
-            print(line)
+            if not line.startswith("frame") or callback is None:
+                continue
+            pairs = line.split()
+            time_str = [pair for pair in pairs if pair.startswith("time")][0]
+            time_str = time_str.split("=")[1]  # 00:00:00.000
+            if time_str.startswith("-"):  # negative time fix
+                continue
+            date_time = datetime.strptime(time_str.split(".")[0], "%H:%M:%S")
+            milliseconds = float(time_str.split(".")[1]) * 10
+            delta = timedelta(
+                hours=date_time.hour,
+                minutes=date_time.minute,
+                seconds=date_time.second,
+                milliseconds=milliseconds,
+            )
+            callback(delta)
 
-        process.communicate()
+        process.wait()
 
 
 def main():
