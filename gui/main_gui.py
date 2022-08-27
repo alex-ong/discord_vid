@@ -16,9 +16,7 @@ class MainApp(tk.Frame):
     def __init__(self, root):
         tk.Frame.__init__(self, root)
         self.root = root
-
-        # self.task_pane = tk.Frame(self)
-        tk.Label(self, text="hello world").grid()
+        self.root.title("DiscordVid")
 
     def add_task(self, task):
         """Adds a task to the gui"""
@@ -29,6 +27,7 @@ class MainApp(tk.Frame):
         # self.task_pane.add_task(task)
 
     def add_and_run_task(self, task):
+        """add a task and run it immediately"""
         self.add_task(task)
         task.generate_file()
 
@@ -53,11 +52,12 @@ def main():
 
 
 def get_gui():
-    """Returns the main gui if it exists"""
+    """Returns the tkinter root gui if it exists"""
     return MAIN_GUI
 
 
 def get_app():
+    """Returns the main frame for the entire application"""
     return MAIN_APP
 
 

@@ -7,7 +7,6 @@ import os
 import subprocess
 import sys
 from enum import Enum
-import time
 from queue import Queue, Empty
 
 from install.install_ffmpeg import FFPROBE_EXE

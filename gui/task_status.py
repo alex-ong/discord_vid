@@ -3,9 +3,10 @@ Task status frame
 """
 
 import tkinter as tk
-from tkinter import ttk
+from gui.labeledprogress import LabeledProgressBar
 from gui.task_args import TaskArgs
 from discord_vid.task import Task
+
 
 # style = ttk.Style()
 # style.theme_use('clam')
@@ -36,7 +37,7 @@ class TaskStatus(tk.Frame):
 
     def create_progressbar(self):
         """creates a new progressbar"""
-        return ttk.Progressbar(self, length=PROGRESS_LENGTH, maximum=100)
+        return LabeledProgressBar(self, length=PROGRESS_LENGTH, maximum=100)
 
     def set_task(self, task: Task):
         """Sets the active task for this gui element"""
@@ -51,14 +52,13 @@ class TaskStatus(tk.Frame):
         current_task, num_subtasks = subtask_count
         perc = seconds_processed / self.task.video_length * 100 / num_subtasks
         self.progress_bar["value"] = (current_task * 100.0 / num_subtasks) + perc
+        self.progress_bar.auto_set_label_perc()
 
     def on_task_finish(self, finished, message):
         """updates progressbar color when the task is finished"""
-        self.progress_bar["value"] = 100
-        if finished:
-            pass
-        else:
-            # self.progress_bar['style'] = "red.Horizontal.TProgressbar"
+        self.progress_bar["value"] = self.progress_bar["maximum"]
+        self.progress_bar.set_label(message)
+        if not finished:
             self.progress_bar = self.create_progressbar()
             self.progress_bar.grid()
 

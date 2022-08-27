@@ -66,11 +66,11 @@ class Task:
         min_size, _, max_size = size
 
         if finished:
-            message = f"Finished: {output_size:.2f}"
+            message = f"Finished: {output_size:.2f}MB"
         elif output_size < min_size:
-            message = f"Too small: {output_size:.2f}"
+            message = f"Too small: {output_size:.2f}MB"
         elif output_size > max_size:
-            message = f"Too big: {output_size:.2f}"
+            message = f"Too big: {output_size:.2f}MB"
 
         if self.on_finish_cb is not None:
             self.on_finish_cb(finished, message)
