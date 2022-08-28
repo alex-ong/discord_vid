@@ -59,8 +59,11 @@ class TaskStatus(tk.Frame):
         self.progress_bar["value"] = self.progress_bar["maximum"]
         self.progress_bar.set_label(message)
         if not finished:
+            self.progress_bar.set_color("red")
             self.progress_bar = self.create_progressbar()
             self.progress_bar.grid()
+        else:
+            self.progress_bar.set_color("green")
 
     def on_task_stop(self, _):
         """triggered when the user cancels the task"""

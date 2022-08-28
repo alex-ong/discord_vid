@@ -18,6 +18,7 @@ class LabeledProgressBar(ttk.Progressbar):  # pylint: disable=too-many-ancestors
         # Create a style with a different name for each instance.
 
         self.style = ttk.Style()
+        self.style.theme_use("clam")
         self.stylename = f"text.Horizontal.TProgressbar{self._inst_count}"
         self.style.layout(
             self.stylename,
@@ -57,13 +58,16 @@ class LabeledProgressBar(ttk.Progressbar):  # pylint: disable=too-many-ancestors
     def set_auto_color(self):
         """sets the background of the progress bar"""
         if self["value"] < self["maximum"]:
-            self.set_color("yellow", "yellow")
+            self.set_color("yellow")
         else:
-            self.set_color("green", "green")
+            self.set_color("green")
 
-    def set_color(self, foreground, background):
+    def set_color(self, background=None, foreground=None):
         """sets the color of the progressbar"""
-        return  # todo
+        if foreground is not None:
+            self.style.configure(self.stylename, troughcolor=foreground)
+        if background is not None:
+            self.style.configure(self.stylename, background=background)
 
 
 if __name__ == "__main__":

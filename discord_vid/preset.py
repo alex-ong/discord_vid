@@ -29,7 +29,7 @@ def get_preset_options(preset: str):
     if preset.lower() == "default":
         preset = config["default_preset"]
     if preset not in presets:
-        raise ValueError("Invalid preset: {preset}")
+        raise ValueError(f"Invalid preset: {preset}")
     return presetdata_to_options(presets[preset])
 
 
