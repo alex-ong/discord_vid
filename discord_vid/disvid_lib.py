@@ -2,7 +2,7 @@
 A bunch of useful library functions
 """
 from datetime import timedelta, datetime
-from threading import Thread
+from threading import Thread, Event
 import os
 import subprocess
 import sys
@@ -12,6 +12,7 @@ from queue import Queue, Empty
 from install.install_ffmpeg import FFPROBE_EXE
 from discord_vid import disvid_nvenc
 from discord_vid import disvid_libx264
+from discord_vid.renderingtask import RenderingTask
 
 
 class Encoder(Enum):
@@ -106,7 +107,6 @@ def generate_file_loop_threaded(generate_file_func, task):
     """runs generate_file_loop in background thread"""
     thread = Thread(target=generate_file_loop, args=(generate_file_func, task))
     thread.start()
-    print("mainthread?")
 
 
 def generate_file_loop(generate_file_func, task):
@@ -122,12 +122,18 @@ def generate_file_loop(generate_file_func, task):
     min_size, target_size, max_size = task.size
     actual_size = file_loop_iter(target_size, generate_file_func, task)
 
+    if task.is_cancelled():
+        return
+
     if actual_size < min_size:
         task.on_encoder_finish(actual_size, target_size, False)
         target_size *= float(max_size) / (actual_size * 1.02)
         actual_size = file_loop_iter(target_size, generate_file_func, task)
 
-    while actual_size > max_size:
+    if task.is_cancelled():
+        return
+
+    while actual_size > max_size and not task.is_cancelled():
         task.on_encoder_finish(actual_size, target_size, False)
         target_size -= int(0.01 * max_size)
         actual_size = file_loop_iter(target_size, generate_file_func, task)
@@ -153,10 +159,10 @@ def file_loop_iter(target_size, ffmpeg_command_gen, task):
     """
     Generates ffmpeg commands and cleanup functions to run, then runs them.
     """
-    commands, output_file, cleanup = generate_file_loop_iter(
-        target_size, ffmpeg_command_gen, task
-    )
-    return execute_file_loop_iter(commands, output_file, cleanup, task.on_update_cb)
+    task_data = generate_file_loop_iter(target_size, ffmpeg_command_gen, task)
+    render_task = RenderingTask(task_data, Event(), task.on_update_cb)
+    task.set_render_task(render_task)
+    return execute_file_loop_iter(render_task)
 
 
 def generate_file_loop_iter(target_size, ffmpeg_command_gen, task):
@@ -172,28 +178,40 @@ def generate_file_loop_iter(target_size, ffmpeg_command_gen, task):
     return ffmpeg_command_gen(bitrate, audio_rate, task.current_options)
 
 
-def execute_file_loop_iter(commands, output_file, cleanup, on_update):
+def execute_file_loop_iter(render_task):
     """
     Executes a set of ffmpeg commands, and the cleanup functions.
     Calls on_update while ffmpeg is running
     """
-    for index, command in enumerate(commands):
-        run_ffmpeg_with_status(command, on_update, (index, len(commands)))
 
-    if cleanup is not None:
-        cleanup(output_file)
+    for index, command in enumerate(render_task.commands):
+        run_ffmpeg_with_status(
+            command,
+            render_task.stop_event,
+            render_task.on_update,
+            (index, len(render_task.commands)),
+        )
+        if render_task.stop_event.is_set():
+            break
 
-    return os.path.getsize(output_file)
+    if render_task.cleanup is not None:
+        render_task.cleanup(render_task.output_file)
+
+    if render_task.stop_event.is_set():
+        return 0
+    return os.path.getsize(render_task.output_file)
 
 
-def enqueue_output(out, queue):
+def enqueue_output(out, queue, stop_event):
     """enqueues a line from the process to the queue"""
     for line in out:
         queue.put(line)
+        if stop_event.is_set():
+            break
     out.close()
 
 
-def run_ffmpeg_with_status(command, callback, subtask_id):
+def run_ffmpeg_with_status(command, stop_event, callback, subtask_id):
     """Runs ffmpeg, calling callback with the percentage"""
     print(command)
     queue = Queue()
@@ -204,20 +222,25 @@ def run_ffmpeg_with_status(command, callback, subtask_id):
         universal_newlines=True,
         bufsize=1,
     ) as process:
-        thread = Thread(target=enqueue_output, args=(process.stdout, queue))
+        thread = Thread(target=enqueue_output, args=(process.stdout, queue, stop_event))
         thread.daemon = True
         thread.start()
-        while thread.is_alive():
+        while not stop_event.is_set() and thread.is_alive():
             try:
-                line = queue.get_nowait()  # or q.get(timeout=.1)
+                line = queue.get(timeout=0.1)
             except Empty:
                 continue
             else:  # got line
                 if callback is None:
                     continue
+
                 progress_seconds = parse_time_line(line)
-                if progress_seconds is not None:
+                if progress_seconds:
                     callback(progress_seconds, subtask_id)
+
+        if stop_event.is_set():  # cancelled
+            print("killing process")
+            process.terminate()
         thread.join()
 
 

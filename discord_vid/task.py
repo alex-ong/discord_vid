@@ -26,18 +26,23 @@ class Task:
         self.input_options = ["-i", filename]
         self.encoder = guess_encoder()
         self.set_encoder(self.encoder)
+        self.on_start_cb = None
         self.on_update_cb = None
         self.on_finish_cb = None
         self.video_length = None
         self.current_options = None  # options of currently running task
+        self.finished = False
+        self.render_task = None
 
-    def set_on_update(self, callback):
-        """register the update callback"""
-        self.on_update_cb = callback
+    def set_render_task(self, render_task):
+        """sets the render task which is the current ffmpeg commands running"""
+        self.render_task = render_task
 
-    def set_on_finish(self, callback):
-        """register the finish callback"""
-        self.on_finish_cb = callback
+    def set_callbacks(self, on_start, on_update, on_finish):
+        """register callbacks for when starting, updating and finishing a task"""
+        self.on_update_cb = on_start
+        self.on_update_cb = on_update
+        self.on_finish_cb = on_finish
 
     def set_encoder(self, encoder: Encoder):
         """sets encoder and target starting size"""
@@ -67,6 +72,7 @@ class Task:
 
         if finished:
             message = f"Finished: {output_size:.2f}MB"
+            self.finished = True
         elif output_size < min_size:
             message = f"Too small: {output_size:.2f}MB"
         elif output_size > max_size:
@@ -74,3 +80,15 @@ class Task:
 
         if self.on_finish_cb is not None:
             self.on_finish_cb(finished, message)
+
+    def cancel(self):
+        """call to kill the task immediately"""
+        if not self.finished:
+            print("cancel called")
+            self.render_task.cancel()
+
+    def is_cancelled(self):
+        """returns if the task is cancelled"""
+        if self.render_task is not None:
+            return self.render_task.stop_event.is_set()
+        return False

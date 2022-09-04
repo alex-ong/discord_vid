@@ -4,7 +4,6 @@ Task status frame
 
 import tkinter as tk
 from gui.labeledprogress import LabeledProgressBar
-from gui.task_args import TaskArgs
 from discord_vid.task import Task
 
 
@@ -15,6 +14,11 @@ from discord_vid.task import Task
 PROGRESS_LENGTH = 280
 
 
+def create_progressbar(root):
+    """creates a labeled progress bar"""
+    return LabeledProgressBar(root, length=PROGRESS_LENGTH, maximum=100)
+
+
 class TaskStatus(tk.Frame):
     """Main frame for a single task"""
 
@@ -22,30 +26,49 @@ class TaskStatus(tk.Frame):
         tk.Frame.__init__(self, *args, **kwargs)
 
         self.title = tk.Label(self, text="file name")
-        self.title.grid()
+        self.title.grid(row=0, sticky=tk.W)
+        self.expand_button = tk.Button(self, command=self.toggle_info)
+        self.expanded = False
 
-        self.progress_bar = self.create_progressbar()
+        self.history_frame = tk.Frame(self)
+        self.history_frame.grid()
+
+        self.progress_bar = create_progressbar(self.history_frame)
         self.progress_bar.grid()
 
-        self.task_args = TaskArgs(self)
-        self.task_args.grid()
+        self.bars = [self.progress_bar]
 
-        self.is_open = False  # expanded or not
-        self.expand_button = None  # todo
-        self.task_root = None  # todo
-        self.task = None  # todo
+        self.task = None
+        self.rendering_task = None
+        self.rendering_stopper = None
 
-    def create_progressbar(self):
-        """creates a new progressbar"""
-        return LabeledProgressBar(self, length=PROGRESS_LENGTH, maximum=100)
+    def toggle_info(self):
+        """toggles the info panels"""
+        self.expanded = not self.expanded
+        self.refresh_infos()
+
+    def refresh_infos(self):
+        """shows progress bars as appropriate"""
+        for pbar in self.bars:
+            pbar.grid_forget()
+
+        if self.expanded:
+            for pbar in self.bars:
+                pbar.grid()
+            self.expand_button.config(text="Less info...")
+        else:
+            self.bars[-1].grid()
+            self.expand_button.config(text="More info...")
 
     def set_task(self, task: Task):
         """Sets the active task for this gui element"""
         self.task = task
         self.title["text"] = task.filename
-        self.task_args.set_task(task)
-        task.set_on_update(self.on_task_update)
-        task.set_on_finish(self.on_task_finish)
+        task.set_callbacks(self.on_task_start, self.on_task_update, self.on_task_finish)
+
+    def on_task_start(self, task_info):
+        """Callback for when the task starts"""
+        print(task_info)
 
     def on_task_update(self, seconds_processed, subtask_count):
         """Callback for when the task updates"""
@@ -60,8 +83,11 @@ class TaskStatus(tk.Frame):
         self.progress_bar.set_label(message)
         if not finished:
             self.progress_bar.set_color("red")
-            self.progress_bar = self.create_progressbar()
-            self.progress_bar.grid()
+            self.progress_bar = create_progressbar(self.history_frame)
+            self.bars.append(self.progress_bar)
+            if len(self.bars) == 2:
+                self.expand_button.grid(row=0, sticky=tk.E)
+            self.refresh_infos()
         else:
             self.progress_bar.set_color("green")
 

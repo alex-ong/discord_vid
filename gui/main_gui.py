@@ -3,6 +3,9 @@ main gui for the program
 """
 
 import tkinter as tk
+from tkinter.messagebox import askyesno
+import time
+import os
 from gui.task_status import TaskStatus
 
 
@@ -17,19 +20,52 @@ class MainApp(tk.Frame):
         tk.Frame.__init__(self, root)
         self.root = root
         self.root.title("DiscordVid")
+        self.root.protocol("WM_DELETE_WINDOW", self.on_gui_stop)
+        self.is_closing = False
+        self.tasks = []
 
     def add_task(self, task):
         """Adds a task to the gui"""
-        print("task added")
+        if self.is_closing:
+            return
+
+        self.tasks.append(task)
         task_gui = TaskStatus(self)
         task_gui.grid()
         task_gui.set_task(task)
-        # self.task_pane.add_task(task)
 
     def add_and_run_task(self, task):
         """add a task and run it immediately"""
         self.add_task(task)
         task.generate_file()
+
+    def on_gui_stop(self):
+        """callback for when the gui stops"""
+        if self.is_closing:
+            return
+        tasks_remaining = [task for task in self.tasks if not task.finished]
+        if len(tasks_remaining) > 0:
+            confirm_quit = show_quit_dialog()
+        else:
+            os._exit(0)  # pylint: disable-msg=protected-access
+
+        if not confirm_quit:
+            return
+
+        self.is_closing = True
+        for task in self.tasks:
+            task.cancel()
+
+        time.sleep(1.0)
+        os._exit(0)  # pylint: disable-msg=protected-access
+
+
+def show_quit_dialog():
+    """shows the quit dialog"""
+    answer = askyesno(
+        title="Quit Confirmation", message="Are you sure that you want to quit?"
+    )
+    return answer
 
 
 def manual_update(root):
