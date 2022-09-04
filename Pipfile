@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 requests = "==2.28.1"
 pyinstaller = "==5.2"
+pyzmq = "==23.2.1"
 
 [dev-packages]
 

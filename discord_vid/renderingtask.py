@@ -4,7 +4,7 @@ so that you can cancel it etc
 """
 
 
-class RenderingTask(object):
+class RenderingTask:
     """
     Class to hold ffmpeg subtask information so that you can cancel it
     """
@@ -21,3 +21,7 @@ class RenderingTask(object):
         """stops the task"""
         print("stop event set")
         self.stop_event.set()
+
+    def is_cancelled(self):
+        """returns whether we have called cancel on this"""
+        return self.stop_event.is_set()

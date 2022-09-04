@@ -3,10 +3,12 @@ Main entrypoint to program.
 Use program with preset and file.
 """
 import sys
+import os
+
 from install import install_context
 from discord_vid.task import Task
 from discord_vid.preset import display_presets
-
+from discord_vid.zmq_service import ZMQService
 from gui.main_gui import main as gui_main, get_gui, get_app
 
 
@@ -24,13 +26,18 @@ def convert(preset, path):
     """
     converts a preset and path to a task then executes it
     """
-    task = Task(preset, path)
-    gui = get_gui()
-    if gui is not None:
-        app = get_app()
-        app.add_and_run_task(task)
-    else:
+    app = get_app()
+    if app is None:
+        task = Task(preset, path)
         task.generate_file()
+        return
+
+    service = ZMQService()
+    if service.server is not None:
+        app.add_task_queue(service)
+    service.client.send(preset, path)
+    if service.server is None:
+        os._exit(0)  # pylint: disable-msg=protected-access
 
 
 def main_convert():
@@ -51,7 +58,8 @@ def main_convert():
         input("Press enter to continue...")
         sys.exit()
 
-    convert(sys.argv[1], sys.argv[2])
+    for i in range(2, len(sys.argv)):
+        convert(sys.argv[1], sys.argv[i])
 
 
 # pipenv run python -m discord_vid.disvid {PRESET} file.mp4

@@ -73,8 +73,8 @@ def safe_delete(path):
     """safely deletes a file if it exists"""
     try:
         os.remove(path)
-    except OSError as e:
-        print(e)
+    except OSError as error:
+        print(error)
 
 
 def delete_logs(prefix):

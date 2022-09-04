@@ -18,7 +18,6 @@ class Task:
     def __init__(self, preset, filename):
         self.preset = preset
         self.filename = filename
-        self.process = None
 
         self.size, self.output_options = get_preset_options(self.preset)
         self.size = list(self.size)
@@ -30,9 +29,9 @@ class Task:
         self.on_update_cb = None
         self.on_finish_cb = None
         self.video_length = None
-        self.current_options = None  # options of currently running task
         self.finished = False
         self.render_task = None
+        self.current_options = None
 
     def set_render_task(self, render_task):
         """sets the render task which is the current ffmpeg commands running"""
@@ -90,5 +89,5 @@ class Task:
     def is_cancelled(self):
         """returns if the task is cancelled"""
         if self.render_task is not None:
-            return self.render_task.stop_event.is_set()
+            return self.render_task.is_cancelled()
         return False

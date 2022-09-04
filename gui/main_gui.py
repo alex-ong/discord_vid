@@ -23,6 +23,7 @@ class MainApp(tk.Frame):
         self.root.protocol("WM_DELETE_WINDOW", self.on_gui_stop)
         self.is_closing = False
         self.tasks = []
+        self.task_queue = None
 
     def add_task(self, task):
         """Adds a task to the gui"""
@@ -59,6 +60,22 @@ class MainApp(tk.Frame):
         time.sleep(1.0)
         os._exit(0)  # pylint: disable-msg=protected-access
 
+    def add_task_queue(self, queue):
+        """adds a zmq_service that can be checked for new things to process"""
+        if self.task_queue is not None:
+            raise ValueError("You can only set this once!")
+        self.task_queue = queue
+        self.check_queue()
+
+    def check_queue(self):
+        """Checks the a task queue"""
+        if self.root is None or self.is_closing:
+            return
+        task = self.task_queue.update()
+        if task is not None:
+            self.add_and_run_task(task)
+        self.root.after(50, self.check_queue)
+
 
 def show_quit_dialog():
     """shows the quit dialog"""
@@ -66,13 +83,6 @@ def show_quit_dialog():
         title="Quit Confirmation", message="Are you sure that you want to quit?"
     )
     return answer
-
-
-def manual_update(root):
-    """Manually update the gui every 16ms"""
-    root.update()
-    if root is not None:
-        root.after(16, lambda: manual_update(root))
 
 
 def main():
@@ -84,7 +94,6 @@ def main():
     app.pack()
     MAIN_GUI = master
     MAIN_APP = app
-    manual_update(master)
 
 
 def get_gui():

@@ -191,14 +191,10 @@ def execute_file_loop_iter(render_task):
             render_task.on_update,
             (index, len(render_task.commands)),
         )
-        if render_task.stop_event.is_set():
-            break
 
     if render_task.cleanup is not None:
         render_task.cleanup(render_task.output_file)
 
-    if render_task.stop_event.is_set():
-        return 0
     return os.path.getsize(render_task.output_file)
 
 
