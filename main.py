@@ -11,6 +11,8 @@ from discord_vid.preset import display_presets
 from discord_vid.zmq_service import ZMQService
 from gui.main_gui import main as gui_main, get_gui, get_app
 
+USE_GUI = True
+
 
 def halt_on_exception(exception_type, value, traceback, oldhook=sys.excepthook):
     """Whenever there is a exception, require user to press enter"""
@@ -22,26 +24,14 @@ def halt_on_exception(exception_type, value, traceback, oldhook=sys.excepthook):
 # sys.excepthook = halt_on_exception
 
 
-def convert(preset, path):
-    """
-    converts a preset and path to a task then executes it
-    """
-    app = get_app()
-    if app is None:
-        task = Task(preset, path)
-        task.generate_file()
-        return
-
-    service = ZMQService()
-    if service.server is not None:
-        app.add_task_queue(service)
-    service.client.send(preset, path)
-    if service.server is None:
-        os._exit(0)  # pylint: disable-msg=protected-access
+def convert_no_gui(preset, path):
+    """converts a task without the gui"""
+    task = Task(preset, path)
+    task.generate_file()
 
 
-def main_convert():
-    """main function for processing argv and then running program"""
+def main_non_convert():
+    """handles installing and uninstalling context hooks"""
     if "--install" in sys.argv:
         install_context.generate_context()
         print("Generated installer in data/install.reg")
@@ -50,6 +40,7 @@ def main_convert():
     elif "--uninstall" in sys.argv:
         install_context.uninstall_context()
         sys.exit()
+
     if len(sys.argv) < 3:
         print(sys.argv[0] + " PRESET file.mp4")
         display_presets()
@@ -58,16 +49,26 @@ def main_convert():
         input("Press enter to continue...")
         sys.exit()
 
-    for i in range(2, len(sys.argv)):
-        convert(sys.argv[1], sys.argv[i])
+
+def main_convert(preset, path):
+    """main function for processing argv and then running program"""
+    service = ZMQService()
+    if service.server is not None:
+        gui_main()  # start the gui
+        app = get_app()
+        app.add_task_queue(service)
+        service.client.send(preset, path)
+        get_gui().mainloop()
+    else:
+        service.client.send(preset, path)
+        os._exit(0)  # pylint: disable-msg=protected-access
 
 
 # pipenv run python -m discord_vid.disvid {PRESET} file.mp4
 if __name__ == "__main__":
-    gui_main()  # uncomment to enable gui
-    tk_gui = get_gui()
-    if tk_gui is not None:
-        tk_gui.after(1, main_convert)
-        tk_gui.mainloop()
+    main_non_convert()  # handle args first
+
+    if USE_GUI:
+        main_convert(sys.argv[1], sys.argv[2])
     else:
-        main_convert()
+        convert_no_gui(sys.argv[1], sys.argv[2])
