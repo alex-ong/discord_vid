@@ -10,6 +10,8 @@ from discord_vid.task import Task
 from discord_vid.preset import display_presets
 from discord_vid.zmq_service import ZMQService
 from gui.main_gui import main as gui_main, get_gui, get_app
+from gui.install_gui import main as install_main
+from gui.uninstall_gui import main as uninstall_main
 
 USE_GUI = True
 
@@ -31,24 +33,23 @@ def convert_no_gui(preset, path):
 
 
 def main_non_convert():
-    """handles installing and uninstalling context hooks"""
+    """
+    handles installing and uninstalling context hooks
+    returns if we should exit the program
+    """
     if "--install" in sys.argv:
-        install_context.generate_context()
-        print("Generated installer in data/install.reg")
-        install_context.install_context()
-        sys.exit()
+        install_main()
     elif "--uninstall" in sys.argv:
-        install_context.uninstall_context()
-        sys.exit()
-
-    if len(sys.argv) < 3:
+        uninstall_main()
+    elif len(sys.argv) < 3 and not USE_GUI:
         print(sys.argv[0] + " PRESET file.mp4")
         display_presets()
         print("sample:")
         print(sys.argv[0] + " default file.mp4")
         input("Press enter to continue...")
-        sys.exit()
-
+    else:
+        return False
+    return True
 
 def main_convert(preset, path):
     """main function for processing argv and then running program"""
@@ -66,8 +67,8 @@ def main_convert(preset, path):
 
 # pipenv run python -m discord_vid.disvid {PRESET} file.mp4
 if __name__ == "__main__":
-    main_non_convert()  # handle args first
-
+    if main_non_convert():  # handle args first
+        sys.exit()
     if USE_GUI:
         main_convert(sys.argv[1], sys.argv[2])
     else:

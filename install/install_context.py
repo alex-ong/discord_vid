@@ -1,25 +1,28 @@
 """
 Toolkit for adding shift+rightclick context menu
 """
-from cgi import print_directory
+
 import os
 import sys
 from discord_vid.preset import get_presets
+import subprocess
 
 INSTALL_ACTUAL = "data/install.reg"
 UNINSTALL_ACTUAL = "data/uninstall.reg"
 
 
 def get_uninstall_header_string():
+    """returns uninstallation header string"""
     strings = [
         "Windows Registry Editor Version 5.00" + "\n",
-        r"[-HKEY_CLASSES_ROOT\*\shell\DiscordVid]" "\n",
-        r"[-HKEY_CLASSES_ROOT\Directory\shell\DiscordVid]" "\n",
+        r"[-HKEY_CLASSES_ROOT\*\shell\DiscordVid]" + "\n",
+        r"[-HKEY_CLASSES_ROOT\Directory\shell\DiscordVid]" + "\n",
     ]
     return strings
 
 
 def get_header_string():
+    """returns the header string"""
     strings = [
         r"Windows Registry Editor Version 5.00",
         r"",
@@ -39,7 +42,7 @@ def get_header_string():
 
 
 def get_preset_string(quality: str, exe_path: str):
-
+    """returns the string for installing one preset"""
     quality_readable = quality.replace("_", " ")
     preset_name = f"DiscordVid.{quality}"
     line1 = (
@@ -115,28 +118,16 @@ def install_context():
     """
     Installs the context file
     """
-    print("We are going to install a registry shortcut to enable right click menu")
-    print(
-        "After completion, hold shift and right click a video"
-        + " then select DiscordVid submenu to convert easily"
-    )
-    print("Press *Yes* to install context menu")
-    print("=" * 10)
-    input("Press enter to continue.")
-    os.startfile(get_install_path() + "/" + INSTALL_ACTUAL)
+    command = get_install_path() + "/" + INSTALL_ACTUAL
+    os.startfile(command)
 
 
 def uninstall_context():
     """
     Uninstalls the context file
-    """
-    print(
-        "We are going to de-install a registry shortcut that previously enabled right click menu"
-    )
-    print("Press *Yes* to uninstall")
-    print("=" * 10)
-    input("Press enter to continue.")
-    os.startfile(get_install_path() + "/" + UNINSTALL_ACTUAL)
+    """    
+    command = get_install_path() + "/" + UNINSTALL_ACTUAL
+    os.startfile(command)
 
 
 # python -m install.install_context"

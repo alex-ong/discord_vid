@@ -17,7 +17,7 @@ GITHUB_URL = "https://github.com"
 
 def get_latest_url():
     """get the latest .msixbundle from github"""
-    data = requests.get(SEVEN_ZIP_URL)
+    data = requests.get(SEVEN_ZIP_URL, timeout=1.0)
     words = data.text.split()
 
     candidates = []

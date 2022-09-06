@@ -63,11 +63,11 @@ def add_to_path(program_path: str):
 
 def download_file(source: str, dest: str):
     """
-    Downloads a file from URL to destionation, with a progress update
+    Downloads a file from URL to destination, with a progress update
     """
     print(f"Downloading file from {source} to {dest}")
     with open(dest, "wb") as file:
-        response = requests.get(source, stream=True)
+        response = requests.get(source, stream=True, timeout=1.0)
         total_length = response.headers.get("content-length")
 
         if total_length is None:  # no content length header
