@@ -5,7 +5,7 @@ Toolkit for adding shift+rightclick context menu
 import os
 import sys
 from discord_vid.preset import get_presets
-import subprocess
+
 
 INSTALL_ACTUAL = "data/install.reg"
 UNINSTALL_ACTUAL = "data/uninstall.reg"
@@ -114,6 +114,15 @@ def generate_context():
         file.writelines(uninstall_lines)
 
 
+def generate_and_install():
+    """
+    Generates installation, uninstallation files.
+    Then calls the installer
+    """
+    generate_context()
+    install_context()
+
+
 def install_context():
     """
     Installs the context file
@@ -125,7 +134,7 @@ def install_context():
 def uninstall_context():
     """
     Uninstalls the context file
-    """    
+    """
     command = get_install_path() + "/" + UNINSTALL_ACTUAL
     os.startfile(command)
 

@@ -51,6 +51,7 @@ def main_non_convert():
         return False
     return True
 
+
 def main_convert(preset, path):
     """main function for processing argv and then running program"""
     service = ZMQService()

@@ -1,12 +1,15 @@
 """
 Installation gui
 """
+
 import tkinter as tk
 from tkinter import ttk
-from tkinter import messagebox
 from discord_vid.config import get_config, save_config
-from install import install_context
-import os
+from install.install_context import generate_and_install
+from gui.uninstall_gui import show_warning
+
+INSTALL_INSTRUCTIONS = "Please press Yes a few times for Regedit to install discord_vid"
+
 
 class InstallApp(tk.Frame):
     """main frame for the program"""
@@ -34,7 +37,7 @@ class InstallFrame(tk.Frame):
         self.check_frame.grid(row=0)
 
         self.default_frame = self.add_default_frame()
-        self.default_frame.grid(row=1,sticky=tk.NSEW)
+        self.default_frame.grid(row=1, sticky=tk.NSEW)
 
         self.install_button = tk.Button(
             self, text="Install selected presets", command=self.install
@@ -60,14 +63,14 @@ class InstallFrame(tk.Frame):
     def add_default_frame(self):
         """Adds frame to select default preset"""
         default_frame = tk.Frame(self)
-        tk.Label(default_frame, text="Default Preset").grid(row=0,sticky=tk.W)
+        tk.Label(default_frame, text="Default Preset").grid(row=0, sticky=tk.W)
 
         self.default_preset = tk.StringVar(self)
         self.default_preset.set(self.get_valid_keys()[0])
         self.default_preset_om = tk.OptionMenu(
             default_frame, self.default_preset, *self.config["presets"].keys()
         )
-        self.default_preset_om.grid(row=0,column=1,sticky=tk.E)
+        self.default_preset_om.grid(row=0, column=1, sticky=tk.E)
         default_frame.columnconfigure(0, weight=1)
         default_frame.columnconfigure(1, weight=1)
         return default_frame
@@ -83,7 +86,7 @@ class InstallFrame(tk.Frame):
 
         save_config(self.config)
         # calls regedit and does the installation
-        show_warning(True)
+        show_warning(INSTALL_INSTRUCTIONS, generate_and_install)
 
     def update_default(self):
         """called whenever we change the default preset"""
@@ -106,20 +109,6 @@ class InstallFrame(tk.Frame):
         """return keys that are checked"""
         return [item[1]["text"] for item in self.checks if item[0].get()]
 
-
-
-def show_warning(exit_program=True):
-    """
-    Shows messagebox warning
-    """
-    messagebox.showinfo('Regedit instructions', 'Please press Yes a few times for Regedit to install discord_vid')
-    try:
-        install_context.generate_context()
-        install_context.install_context()
-    except OSError: # user hit cancel
-        pass
-    if exit_program:
-        os._exit(0)  # pylint: disable-msg=protected-access
 
 def main():
     """runs the installer gui app"""

@@ -211,12 +211,14 @@ def run_ffmpeg_with_status(command, stop_event, callback, subtask_id):
     """Runs ffmpeg, calling callback with the percentage"""
     print(command)
     queue = Queue()
+
     with subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         universal_newlines=True,
         bufsize=1,
+        startupinfo=hide_ffmpeg(),
     ) as process:
         thread = Thread(target=enqueue_output, args=(process.stdout, queue, stop_event))
         thread.daemon = True
@@ -235,7 +237,6 @@ def run_ffmpeg_with_status(command, stop_event, callback, subtask_id):
                     callback(progress_seconds, subtask_id)
 
         if stop_event.is_set():  # cancelled
-            print("killing process")
             process.terminate()
         thread.join()
 
@@ -258,6 +259,13 @@ def parse_time_line(line):
         milliseconds=milliseconds,
     )
     return delta.total_seconds()
+
+
+def hide_ffmpeg():
+    """returns a startupinfo that can hide ffmpeg"""
+    startup_info = subprocess.STARTUPINFO()
+    startup_info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    return startup_info
 
 
 def main():
