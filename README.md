@@ -1,6 +1,10 @@
 # Discord Video Resizer
 
+![MainGUI](./doc/main_gui.png)
+
 Calculate and forward FFMPEG commands, staying under Discords 8MB limit.
+Supports multiple files at the same time, as well as automatically using CPU vs NVENC encoding
+
 
 # Installation
 Download the latest version from:
@@ -9,6 +13,12 @@ https://github.com/alex-ong/discord_vid/releases/
 
 1. Unzip the folder somewhere useful.
 2. Run `install.bat`
+3. Select which presets you want in your `shift+rightclick` context menu
+4. Select the default preset you want to compress to
+5. Click "Install selected presets" and press yes a few times
+
+![Installer](./doc/installer.png)
+
 This will add a `shift+right click` context menu
 
 
