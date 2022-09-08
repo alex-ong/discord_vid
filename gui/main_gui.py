@@ -2,12 +2,14 @@
 main gui for the program
 """
 
-import tkinter as tk
-from tkinter.messagebox import askyesno
 import time
 import os
-from gui.task_status import TaskStatus
+import tkinter as tk
+from tkinter.messagebox import askyesno
+from tkinterdnd2 import TkinterDnD, DND_FILES
 
+from gui.task_status import TaskStatus
+from discord_vid.task import Task
 
 MAIN_APP = None
 MAIN_GUI = None
@@ -25,18 +27,44 @@ class MainApp(tk.Frame):
         self.tasks = []
         self.task_queue = None
 
+        self.task_frame = tk.Frame(self)
+        self.task_frame.grid()
+
+        # register dropping
+        self.register_dropping()
+        self.last_preset = None
+
+    def register_dropping(self):
+        """register this applicaiton for drag/dropping files"""
+        self.drop_target_register(DND_FILES)  # pylint: disable=no-member
+        self.dnd_bind(  # pylint: disable=no-member
+            "<<Drop>>", lambda e: self.on_drop_file(e.data)
+        )
+        drop_label = tk.Label(
+            self, text="Drag more video files here", borderwidth=3, relief="groove"
+        )
+        drop_label.grid()
+
+    def on_drop_file(self, path):
+        """callback for when user drops file"""
+        task = Task(self.last_preset, path)
+        self.add_and_run_task(task)
+
     def add_task(self, task):
         """Adds a task to the gui"""
         if self.is_closing:
             return
 
         self.tasks.append(task)
-        task_gui = TaskStatus(self)
+        task_gui = TaskStatus(self.task_frame)
         task_gui.grid()
         task_gui.set_task(task)
+        self.last_preset = task.preset
 
     def add_and_run_task(self, task):
         """add a task and run it immediately"""
+        if self.is_closing:
+            return
         self.add_task(task)
         task.generate_file()
 
@@ -89,7 +117,7 @@ def main():
     """main entrypoint to the program"""
     global MAIN_APP  # pylint: disable-msg=global-statement
     global MAIN_GUI  # pylint: disable-msg=global-statement
-    master = tk.Tk()
+    master = TkinterDnD.Tk()  # notice - use this instead of tk.Tk()
     app = MainApp(master)
     app.pack()
     MAIN_GUI = master
