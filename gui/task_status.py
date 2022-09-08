@@ -11,7 +11,7 @@ from discord_vid.task import Task, TaskCallbacks
 # style.theme_use('clam')
 # style.configure("red.Horizontal.TProgressbar", foreground='red', background='red')
 
-PROGRESS_LENGTH = 280
+PROGRESS_LENGTH = 350
 
 
 def create_progressbar(root):
@@ -23,6 +23,8 @@ class TaskStatus(tk.Frame):
     """Main frame for a single task"""
 
     def __init__(self, *args, **kwargs):
+        kwargs["borderwidth"] = 3
+        kwargs["relief"] = "groove"
         tk.Frame.__init__(self, *args, **kwargs)
 
         self.title = tk.Label(self, text="file name")
