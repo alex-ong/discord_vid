@@ -62,7 +62,7 @@ class MainApp(tk.Frame):
         if self.is_closing:
             return
 
-        tasks_remaining = self.task_queue.tasks[:]
+        tasks_remaining = self.task_queue.get_remaining_tasks()
 
         if len(tasks_remaining) > 0:
             confirm_quit = show_quit_dialog()

@@ -16,6 +16,10 @@ class TaskQueue:
         self.finished_tasks = []
         self.concurrency = get_config()["simultaneous_tasks"]
 
+    def get_remaining_tasks(self):
+        """return all tasks that are not finished"""
+        return self.tasks + self.processing_tasks
+
     def send_task(self, preset, filename):
         """sends a task to a remote zmq_service"""
         self.zmq_service.client.send(preset, filename)
