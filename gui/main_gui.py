@@ -9,7 +9,6 @@ from tkinter.messagebox import askyesno
 from tkinterdnd2 import TkinterDnD, DND_FILES
 
 from gui.task_status import TaskStatus
-from discord_vid.task import Task
 
 MAIN_APP = None
 MAIN_GUI = None
@@ -24,7 +23,6 @@ class MainApp(tk.Frame):
         self.root.title("DiscordVid")
         self.root.protocol("WM_DELETE_WINDOW", self.on_gui_stop)
         self.is_closing = False
-        self.tasks = []
         self.task_queue = None
 
         self.task_frame = tk.Frame(self)
@@ -47,32 +45,25 @@ class MainApp(tk.Frame):
 
     def on_drop_file(self, path):
         """callback for when user drops file"""
-        task = Task(self.last_preset, path)
-        self.add_and_run_task(task)
+        self.task_queue.manual_add_task(self.last_preset, path)
 
     def add_task(self, task):
         """Adds a task to the gui"""
         if self.is_closing:
             return
 
-        self.tasks.append(task)
         task_gui = TaskStatus(self.task_frame)
         task_gui.grid()
         task_gui.set_task(task)
         self.last_preset = task.preset
 
-    def add_and_run_task(self, task):
-        """add a task and run it immediately"""
-        if self.is_closing:
-            return
-        self.add_task(task)
-        task.generate_file()
-
     def on_gui_stop(self):
         """callback for when the gui stops"""
         if self.is_closing:
             return
-        tasks_remaining = [task for task in self.tasks if not task.finished]
+
+        tasks_remaining = self.task_queue.tasks[:]
+
         if len(tasks_remaining) > 0:
             confirm_quit = show_quit_dialog()
         else:
@@ -82,8 +73,7 @@ class MainApp(tk.Frame):
             return
 
         self.is_closing = True
-        for task in self.tasks:
-            task.cancel()
+        self.task_queue.cancel_all()
 
         time.sleep(1.0)
         os._exit(0)  # pylint: disable-msg=protected-access
@@ -96,12 +86,12 @@ class MainApp(tk.Frame):
         self.check_queue()
 
     def check_queue(self):
-        """Checks the a task queue"""
+        """Checks the task queue"""
         if self.root is None or self.is_closing:
             return
         task = self.task_queue.update()
         if task is not None:
-            self.add_and_run_task(task)
+            self.add_task(task)
         self.root.after(50, self.check_queue)
 
 

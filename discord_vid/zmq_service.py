@@ -8,6 +8,13 @@ from queue import Empty
 import zmq
 from discord_vid.task import Task
 
+
+def construct_message(preset, file):
+    """constructs a dict message to send"""
+    message = {"preset": preset, "file": file}
+    return message
+
+
 # from discord_vid.config import get_config
 class ZMQService:
     """
@@ -41,6 +48,10 @@ class ZMQService:
     def needs_update(self):
         """returns whether we should call update loop"""
         return self.server is not None
+
+    def manual_add_task(self, preset, file):
+        """adds a task manually to the server's queue"""
+        self.server.add_manual_task(preset, file)
 
 
 class ZMQServer:
@@ -77,6 +88,11 @@ class ZMQServer:
             self.requests.put(data)
             self.socket.send_string("received")
 
+    def add_manual_task(self, preset, file):
+        """manually adds a task to the servers queue"""
+        message = construct_message(preset, file)
+        self.requests.put(message)
+
 
 class ZMQClient:  # pylint: disable-msg=too-few-public-methods
     """simple client that will send a single message then exit"""
@@ -90,7 +106,7 @@ class ZMQClient:  # pylint: disable-msg=too-few-public-methods
     def send(self, preset, file):
         """send a text message"""
         print(f"sending messsage {preset} {file}")
-        message = {"preset": preset, "file": file}
+        message = construct_message(preset, file)
         self.socket.send_string(json.dumps(message))
         #  Get the reply.
         message = self.socket.recv()

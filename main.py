@@ -5,10 +5,9 @@ Use program with preset and file.
 import sys
 import os
 
-from install import install_context
-from discord_vid.task import Task
 from discord_vid.preset import display_presets
-from discord_vid.zmq_service import ZMQService
+from discord_vid.task import Task
+from discord_vid.taskqueue import TaskQueue
 from gui.main_gui import main as gui_main, get_gui, get_app
 from gui.install_gui import main as install_main
 from gui.uninstall_gui import main as uninstall_main
@@ -54,15 +53,15 @@ def main_non_convert():
 
 def main_convert(preset, path):
     """main function for processing argv and then running program"""
-    service = ZMQService()
-    if service.server is not None:
+    task_queue = TaskQueue()
+    if task_queue.is_master_queue():
         gui_main()  # start the gui
         app = get_app()
-        app.add_task_queue(service)
-        service.client.send(preset, path)
+        app.add_task_queue(task_queue)
+        task_queue.send_task(preset, path)
         get_gui().mainloop()
     else:
-        service.client.send(preset, path)
+        task_queue.send_task(preset, path)
         os._exit(0)  # pylint: disable-msg=protected-access
 
 
