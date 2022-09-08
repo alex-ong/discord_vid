@@ -4,7 +4,7 @@ Task status frame
 
 import tkinter as tk
 from gui.labeledprogress import LabeledProgressBar
-from discord_vid.task import Task
+from discord_vid.task import Task, TaskCallbacks
 
 
 # style = ttk.Style()
@@ -64,7 +64,10 @@ class TaskStatus(tk.Frame):
         """Sets the active task for this gui element"""
         self.task = task
         self.title["text"] = task.filename
-        task.set_callbacks(self.on_task_start, self.on_task_update, self.on_task_finish)
+        callbacks = TaskCallbacks(
+            self.on_task_start, self.on_task_update, self.on_task_finish
+        )
+        task.set_callbacks(callbacks)
 
     def on_task_start(self, task_info):
         """Callback for when the task starts"""

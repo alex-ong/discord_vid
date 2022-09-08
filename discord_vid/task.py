@@ -2,6 +2,7 @@
 Basic task framework on ffmpeg tasks
 """
 import os
+from collections import namedtuple
 from discord_vid.preset import get_preset_options
 from discord_vid.disvid_lib import (
     guess_encoder,
@@ -10,6 +11,9 @@ from discord_vid.disvid_lib import (
     generate_file_loop_threaded,
     bytes_to_mb,
 )
+
+
+TaskCallbacks = namedtuple("TaskCallbacks", ["start", "update", "finish"])
 
 
 class Task:
@@ -25,9 +29,7 @@ class Task:
         self.input_options = ["-i", filename]
         self.encoder = guess_encoder()
         self.set_encoder(self.encoder)
-        self.on_start_cb = None
-        self.on_update_cb = None
-        self.on_finish_cb = None
+        self.callbacks = None
         self.video_length = None
         self.finished = False
         self.render_task = None
@@ -37,11 +39,9 @@ class Task:
         """sets the render task which is the current ffmpeg commands running"""
         self.render_task = render_task
 
-    def set_callbacks(self, on_start, on_update, on_finish):
+    def set_callbacks(self, callbacks: TaskCallbacks):
         """register callbacks for when starting, updating and finishing a task"""
-        self.on_update_cb = on_start
-        self.on_update_cb = on_update
-        self.on_finish_cb = on_finish
+        self.callbacks = callbacks
 
     def set_encoder(self, encoder: Encoder):
         """sets encoder and target starting size"""
@@ -77,8 +77,8 @@ class Task:
         elif output_size > max_size:
             message = f"Too big: {output_size:.2f}MB"
 
-        if self.on_finish_cb is not None:
-            self.on_finish_cb(finished, message)
+        if self.callbacks.finish is not None:
+            self.callbacks.finish(finished, message)
 
     def cancel(self):
         """call to kill the task immediately"""

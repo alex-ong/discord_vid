@@ -160,7 +160,7 @@ def file_loop_iter(target_size, ffmpeg_command_gen, task):
     Generates ffmpeg commands and cleanup functions to run, then runs them.
     """
     task_data = generate_file_loop_iter(target_size, ffmpeg_command_gen, task)
-    render_task = RenderingTask(task_data, Event(), task.on_update_cb)
+    render_task = RenderingTask(task_data, Event(), task.callbacks.update)
     task.set_render_task(render_task)
     return execute_file_loop_iter(render_task)
 

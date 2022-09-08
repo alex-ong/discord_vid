@@ -26,5 +26,6 @@
             "args": ["-b:a", "128k" ]
         }
     },
-    "default_preset": "8MB_720p30"
+    "default_preset": "8MB_720p30",
+    "simultaneous_tasks": 4
 }
