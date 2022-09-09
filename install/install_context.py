@@ -10,6 +10,11 @@ from discord_vid.preset import get_presets
 INSTALL_ACTUAL = "data/install.reg"
 UNINSTALL_ACTUAL = "data/uninstall.reg"
 
+COMMAND_STORE = (
+    r"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\\"
+    + r"\CurrentVersion\Explorer\CommandStore\shell\DiscordVid."
+)
+
 
 def get_uninstall_header_string():
     """returns uninstallation header string"""
@@ -17,6 +22,7 @@ def get_uninstall_header_string():
         "Windows Registry Editor Version 5.00" + "\n",
         r"[-HKEY_CLASSES_ROOT\*\shell\DiscordVid]" + "\n",
         r"[-HKEY_CLASSES_ROOT\Directory\shell\DiscordVid]" + "\n",
+        r"[-" + COMMAND_STORE + "Default]" + "\n",
     ]
     return strings
 
@@ -28,36 +34,37 @@ def get_header_string():
         r"",
         r"[HKEY_CLASSES_ROOT\*\shell\DiscordVid]",
         r'"MUIVerb"="DiscordVid"',
-        r'"SubCommands"="DiscordVid.Default;DiscordVid.8MB_720p30;DiscordVid.8MB_720p60;DiscordVid.50MB_1080p30;DiscordVid.50MB_1080p60;DiscordVid.100MB"',
+        r'"SubCommands"="{sub_commands}"',
         r'"Extended"=""',
         r'"Icon"="{icon_path}"',
         r"",
-        r"[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\DiscordVid.Default]",
+        r"[" + COMMAND_STORE + "Default]",
         r'"MUIVerb"="Compress (default)"',
-        r"[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\DiscordVid.Default\command]",
+        r"[" + COMMAND_STORE + r"Default\command]",
         r'@="\"{exe_path}\" \"default\" \"%1\""',
         r"",
     ]
     return "\n".join(strings)
 
 
+def get_regedit_name(preset_name: str):
+    """returns the regedit entry name for a preset"""
+    return f"DiscordVid.{preset_name}"
+
+
+def get_sub_commands(presets):
+    """returns presets list for regedit header"""
+    presets = ["Default"] + list(presets)
+    return ";".join(get_regedit_name(preset) for preset in presets)
+
+
 def get_preset_string(quality: str, exe_path: str):
     """returns the string for installing one preset"""
     quality_readable = quality.replace("_", " ")
-    preset_name = f"DiscordVid.{quality}"
-    line1 = (
-        r"[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell"
-        + "\\"
-    )
-    line1 += preset_name + "]\n"
-    line2 = r'"MUIVerb"="Compress to ' + quality_readable + '"\n'
+    line1 = "[" + COMMAND_STORE + quality + "]\n"
+    line2 = '"MUIVerb"="Compress to ' + quality_readable + '"\n'
 
-    line3 = (
-        r"[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\DiscordVid."
-        + f"{quality}"
-        + r"\command]"
-        + "\n"
-    )
+    line3 = "[" + COMMAND_STORE + quality + r"\command]" + "\n"
     line4 = r'@="\"' + exe_path + r"\" \"" + quality + r'\" \"%1\""' + "\n"
 
     preset = [line1, line2, line3, line4]
@@ -97,6 +104,7 @@ def generate_context():
     header = get_header_string()
     header = header.replace("{exe_path}", exe)
     header = header.replace("{icon_path}", icon)
+    header = header.replace("{sub_commands}", get_sub_commands(get_presets()))
 
     preset_lines = []
     uninstall_lines = []
