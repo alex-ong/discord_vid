@@ -14,23 +14,31 @@ MAIN_APP = None
 MAIN_GUI = None
 
 
+def exit_immediately():
+    """exits the program immediately"""
+    os._exit(0)  # pylint: disable-msg=protected-access
+
+
 class MainApp(tk.Frame):
     """main frame for the program"""
 
-    def __init__(self, root):
+    def __init__(self, root, task_queue):
         tk.Frame.__init__(self, root)
         self.root = root
         self.root.title("DiscordVid")
         self.root.protocol("WM_DELETE_WINDOW", self.on_gui_stop)
-        self.is_closing = False
-        self.task_queue = None
 
+        self.is_closing = False
+        self.last_preset = None
+        # add task queue and spin off checking it every so often
+        self.task_queue = task_queue  # tasks that need to be executed
         self.task_frame = tk.Frame(self)
         self.task_frame.grid()
 
-        # register dropping
+        # register dropping files
         self.register_dropping()
-        self.last_preset = None
+        # start checking the queue
+        self.check_queue()
 
     def register_dropping(self):
         """register this applicaiton for drag/dropping files"""
@@ -48,7 +56,7 @@ class MainApp(tk.Frame):
         self.task_queue.manual_add_task(self.last_preset, path)
 
     def add_task(self, task):
-        """Adds a task to the gui"""
+        """Links a data-based task to the gui"""
         if self.is_closing:
             return
 
@@ -63,27 +71,17 @@ class MainApp(tk.Frame):
             return
 
         tasks_remaining = self.task_queue.get_remaining_tasks()
+        if len(tasks_remaining) == 0:
+            exit_immediately()
 
-        if len(tasks_remaining) > 0:
-            confirm_quit = show_quit_dialog()
-        else:
-            os._exit(0)  # pylint: disable-msg=protected-access
+        if not show_quit_dialog():
+            return  # they pressed "No", so don't quit
 
-        if not confirm_quit:
-            return
-
+        # quitting "nicely"
         self.is_closing = True
         self.task_queue.cancel_all()
-
         time.sleep(1.0)
-        os._exit(0)  # pylint: disable-msg=protected-access
-
-    def add_task_queue(self, queue):
-        """adds a zmq_service that can be checked for new things to process"""
-        if self.task_queue is not None:
-            raise ValueError("You can only set this once!")
-        self.task_queue = queue
-        self.check_queue()
+        exit_immediately()
 
     def check_queue(self):
         """Checks the task queue"""
@@ -103,26 +101,9 @@ def show_quit_dialog():
     return answer
 
 
-def main():
+def main(task_queue):
     """main entrypoint to the program"""
-    global MAIN_APP  # pylint: disable-msg=global-statement
-    global MAIN_GUI  # pylint: disable-msg=global-statement
     master = TkinterDnD.Tk()  # notice - use this instead of tk.Tk()
-    app = MainApp(master)
+    app = MainApp(master, task_queue)
     app.pack()
-    MAIN_GUI = master
-    MAIN_APP = app
-
-
-def get_gui():
-    """Returns the tkinter root gui if it exists"""
-    return MAIN_GUI
-
-
-def get_app():
-    """Returns the main frame for the entire application"""
-    return MAIN_APP
-
-
-if __name__ == "__main__":
-    main()
+    master.mainloop()

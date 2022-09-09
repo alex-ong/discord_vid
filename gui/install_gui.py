@@ -86,7 +86,7 @@ class InstallFrame(tk.Frame):
 
         save_config(self.config)
         # calls regedit and does the installation
-        show_warning(INSTALL_INSTRUCTIONS, generate_and_install)
+        show_warning("Install", INSTALL_INSTRUCTIONS, generate_and_install)
 
     def update_default(self):
         """called whenever we change the default preset"""

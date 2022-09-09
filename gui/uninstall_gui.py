@@ -7,14 +7,15 @@ from tkinter import messagebox
 from install.install_context import uninstall_context
 
 MSG = "Please press Yes a few times for Regedit to uninstall the discord_vid"
+TITLE = "Uninstall discord_vid"
 
 
-def show_warning(message, func, exit_program=True):
+def show_warning(title, message, func, exit_program=True):
     """
     Shows messagebox warning
     """
     messagebox.showinfo(
-        "Instructions",
+        title,
         message,
     )
     try:
@@ -25,10 +26,10 @@ def show_warning(message, func, exit_program=True):
         os._exit(0)  # pylint: disable-msg=protected-access
 
 
-def main():
+def main(title=TITLE, msg=MSG, func=uninstall_context):
     """runs the installer gui app"""
     master = tk.Tk()
-    master.title("Uninstall discord_vid")
+    master.title(title)
     master.iconify()
-    master.after(1, lambda: show_warning(MSG, uninstall_context))
+    master.after(1, lambda: show_warning(title, msg, func))
     master.mainloop()

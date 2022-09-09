@@ -46,4 +46,4 @@ def display_presets():
     print("Preset list:\n" + "\n".join(presets))
     default_preset = config["default_preset"]
     print(f"Default preset: {default_preset}")
-    return config["presets"].keys()
+    return (presets, default_preset)
