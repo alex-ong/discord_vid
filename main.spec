@@ -3,22 +3,25 @@ from PyInstaller.utils.hooks import collect_all
 
 block_cipher = None
 
-added_files = [	
-    ( 'ffmpeg/*', 'ffmpeg/' ),
-	( 'data/*', 'data/')
+added_files = [
+    ("ffmpeg/*", "ffmpeg/"),
+    ("data/DEFAULT_CONFIG.json", "data/"),
+    ("data/discordvidlogo-24-black.ico", "data/"),
 ]
 
 datas = []
 binaries = []
 hiddenimports = []
-#tmp_ret = collect_all('tkdnd')
-#datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
-tmp_ret = collect_all('tkinterdnd2')
-datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+# tmp_ret = collect_all('tkdnd')
+# datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+tmp_ret = collect_all("tkinterdnd2")
+datas += tmp_ret[0]
+binaries += tmp_ret[1]
+hiddenimports += tmp_ret[2]
 datas += added_files
 
 a = Analysis(
-    ['main.py'],
+    ["main.py"],
     pathex=[],
     binaries=binaries,
     datas=datas,
@@ -39,7 +42,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='dv',
+    name="dv",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -59,5 +62,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='dv',
+    name="dv",
 )
