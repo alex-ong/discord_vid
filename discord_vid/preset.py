@@ -34,13 +34,13 @@ def get_preset_options(preset: str):
 
 
 def get_presets():
-    """ Return list of preset names """
+    """Return list of preset names"""
     config = get_config()
     return config["presets"].keys()
 
 
 def display_presets():
-    """ Prints out preset names """
+    """Prints out preset names"""
     config = get_config()
     presets = config["presets"].keys()
     print("Preset list:\n" + "\n".join(presets))

@@ -13,14 +13,14 @@ CONFIG = None
 
 
 def get_default_config_path():
-    """ returns default config path"""
+    """returns default config path"""
     folder = os.path.split(sys.argv[0])[0]
     root = os.path.abspath(folder)
     return root + "/" + DEFAULT_CONFIG
 
 
 def get_user_config_path():
-    """ returns default user config path"""
+    """returns default user config path"""
     folder = os.path.split(sys.argv[0])[0]
     root = os.path.abspath(folder)
     return root + "/" + USER_CONFIG

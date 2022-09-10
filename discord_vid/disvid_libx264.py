@@ -25,14 +25,13 @@ def guess_target(max_size):
     return 0.97 * max_size
 
 
-def generate_file_cmd(v_rate, a_rate, options):
+def generate_file_cmd(v_rate, options):
     """
     Generate file with libx264 2-pass options auto-injected
     """
 
     input_options, output_options = options
     v_rate /= 1024
-    a_rate /= 1024
 
     output_no_file = output_options[:-1]
     output_file = output_options[-1]
@@ -58,7 +57,6 @@ def generate_file_cmd(v_rate, a_rate, options):
         + f"-b:v {v_rate:.0f}k -minrate {v_rate/2:.0f}k".split()
         + f"-maxrate {v_rate*1.5:.0f}k -bufsize 1M".split()
         + "-threads 8 -speed 2 -row-mt 1 -tile-columns 2".split()
-        + f"-b:a {a_rate:.0f}k".split()
         + "-pass 2".split()
         + f"-passlogfile {output_file}".split()
         + output_options

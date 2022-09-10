@@ -175,7 +175,7 @@ def generate_file_loop_iter(target_size, ffmpeg_command_gen, task):
     if bitrate < 0:
         raise ValueError("Not enough bits for video")
 
-    return ffmpeg_command_gen(bitrate, audio_rate, task.current_options)
+    return ffmpeg_command_gen(bitrate, task.current_options)
 
 
 def execute_file_loop_iter(render_task):

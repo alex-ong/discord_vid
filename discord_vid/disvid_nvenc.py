@@ -24,23 +24,21 @@ def guess_target(max_size):
     return 0.98 * max_size
 
 
-def generate_file_cmd(v_rate, a_rate, options):
+def generate_file_cmd(v_rate, options):
     """
     Generates subprocess command to run, and the output filename.
     """
 
     input_options, output_options = options
     v_rate /= 1024
-    a_rate /= 1024
     # fmt: off
     command = (
         [FFMPEG_EXE, "-y"]
         + "-v quiet -stats".split()
         + input_options
         + [ "-b:v", f"{v_rate:.0f}k", "-maxrate", f"{v_rate*1.5:.0f}k",
-            "-minrate", f"{v_rate:.0f}k",
-            "-bufsize", "1M",
-            "-b:a",f"{a_rate:.0f}k"]
+            "-minrate", f"{v_rate*0.7:.0f}k",
+            "-bufsize", "1M"]
         + output_options # passthrough options.
         )
 
