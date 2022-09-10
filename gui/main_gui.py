@@ -13,6 +13,7 @@ from gui.task_status import TaskStatus
 MAIN_APP = None
 MAIN_GUI = None
 
+ICON_PATH = "data/discordvidlogo-32.ico"
 
 def exit_immediately():
     """exits the program immediately"""
@@ -27,6 +28,7 @@ class MainApp(tk.Frame):
         self.root = root
         self.root.title("DiscordVid")
         self.root.protocol("WM_DELETE_WINDOW", self.on_gui_stop)
+        self.root.iconbitmap(ICON_PATH)
 
         self.is_closing = False
         self.last_preset = None

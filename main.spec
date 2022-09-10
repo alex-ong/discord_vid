@@ -7,6 +7,7 @@ added_files = [
     ("ffmpeg/*", "ffmpeg/"),
     ("data/DEFAULT_CONFIG.json", "data/"),
     ("data/discordvidlogo-24-black.ico", "data/"),
+    ("data/discordvidlogo-32.ico", "data/"),
 ]
 
 datas = []
@@ -53,6 +54,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon="data/discordvidlogo-32.ico",
 )
 coll = COLLECT(
     exe,
