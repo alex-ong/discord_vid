@@ -7,7 +7,7 @@ import os
 import tkinter as tk
 from tkinter.messagebox import askyesno
 from tkinterdnd2 import TkinterDnD, DND_FILES
-
+from install.install_context import get_install_path
 from gui.task_status import TaskStatus
 
 MAIN_APP = None
@@ -28,7 +28,7 @@ class MainApp(tk.Frame):
         self.root = root
         self.root.title("DiscordVid")
         self.root.protocol("WM_DELETE_WINDOW", self.on_gui_stop)
-        self.root.iconbitmap(ICON_PATH)
+        self.root.iconbitmap(get_install_path() + "/" + ICON_PATH)
 
         self.is_closing = False
         self.last_preset = None
