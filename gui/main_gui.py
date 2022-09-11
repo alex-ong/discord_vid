@@ -15,6 +15,7 @@ MAIN_GUI = None
 
 ICON_PATH = "data/discordvidlogo-32.ico"
 
+
 def exit_immediately():
     """exits the program immediately"""
     os._exit(0)  # pylint: disable-msg=protected-access
