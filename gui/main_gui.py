@@ -44,7 +44,7 @@ class MainApp(tk.Frame):
         self.check_queue()
 
     def register_dropping(self):
-        """register this applicaiton for drag/dropping files"""
+        """register this applicaition for drag/dropping files"""
         self.drop_target_register(DND_FILES)  # pylint: disable=no-member
         self.dnd_bind(  # pylint: disable=no-member
             "<<Drop>>", lambda e: self.on_drop_file(e.data)
