@@ -24,6 +24,7 @@ def download_ffmpeg():
     os.makedirs(FFMPEG_PATH, exist_ok=True)
     download_file(URL, OUT_ZIP)
     subprocess.call("./7z/7za e ffmpeg/ffmpeg.7z *.exe -r -aoa -offmpeg")
+    os.remove(OUT_ZIP)
 
 
 # python -m install.install_ffmpeg
