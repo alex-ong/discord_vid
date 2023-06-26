@@ -60,6 +60,12 @@ def add_to_path(program_path: str):
         f"Added {program_path} to path, please restart shell for changes to take effect"
     )
 
+def print_progress(downloaded, total_length):
+    """Debug for printing progress to stdout"""
+    done = int(50 * downloaded / total_length)
+    done, not_done = "=" * done, " " * (50 - done)
+    sys.stdout.write(f"\r[{done}{not_done}]")
+    sys.stdout.flush()
 
 def download_file(source: str, dest: str, on_update):
     """
@@ -78,8 +84,7 @@ def download_file(source: str, dest: str, on_update):
             for data in response.iter_content(chunk_size=4096):
                 downloaded += len(data)
                 file.write(data)
-                done = int(50 * downloaded / total_length)
-                done, not_done = "=" * done, " " * (50 - done)
+               
                 on_update(downloaded / float(total_length))
-                sys.stdout.write(f"\r[{done}{not_done}]")
-                sys.stdout.flush()
+                # must be commented for full build...
+                # print_progress(downloaded, total_length) 
