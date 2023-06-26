@@ -2,7 +2,7 @@
 
 ![MainGUI](./doc/main_gui.png)
 
-Calculate and forward FFMPEG commands, staying under Discords 8MB limit.
+Calculate and forward FFMPEG commands, staying under Discords 25MB limit.
 Supports multiple files at the same time, as well as automatically using CPU vs NVENC encoding
 
 
