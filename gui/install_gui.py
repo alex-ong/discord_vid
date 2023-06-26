@@ -6,9 +6,49 @@ import tkinter as tk
 from tkinter import ttk
 from discord_vid.config import get_config, save_config
 from install.install_context import generate_and_install
+from install.install_ffmpeg import install_ffmpeg, ffmpeg_installed
 from gui.uninstall_gui import show_warning
 
-INSTALL_INSTRUCTIONS = "Please press Yes a few times for Regedit to install discord_vid"
+INSTALL_INSTRUCTIONS = (
+    "Please press Yes a few times for Regedit to install discord_vid.\n"
+    + "When it's all done, shift+right click a video to test!"
+)
+INSTALL_FFMPEG = (
+    "A command prompt will open, and download ffmpeg. please wait for it to complete"
+)
+
+
+class InstallFfmpeg(tk.Toplevel):
+    """progress bar frame for ffmpeg"""
+
+    def __init__(self):
+        tk.Toplevel.__init__(self)
+        self.title = "Download and install ffmpeg"
+        self.frame = tk.Frame(self)
+        self.frame.pack()
+
+        self.progress_label = tk.Label(self.frame, text="Downloading ffmpeg")
+        self.progress_label.grid()
+        self.progress_bar = ttk.Progressbar(
+            self.frame, orient="horizontal", mode="determinate", length=280, maximum=1.0
+        )
+        self.progress_bar.grid()
+        self.grab_set_global()
+        self.update()
+        install_ffmpeg(self.update_callback, True)
+
+    def update_callback(self, data):
+        """Called when ffmpeg installer has progress"""
+        if data is None:
+            self.destroy()
+            return
+        if isinstance(data, str):
+            self.progress_label.config(text=data)
+            self.progress_label.update()
+        elif isinstance(data, float):
+            self.progress_bar["value"] = data
+            self.progress_bar.update()
+        self.update()
 
 
 class InstallApp(tk.Frame):
@@ -42,7 +82,25 @@ class InstallFrame(tk.Frame):
         self.install_button = tk.Button(
             self, text="Install selected presets", command=self.install
         )
-        self.install_button.grid(row=2)
+        self.install_ffmpeg_check = self.add_ffmpeg_checkmark()
+
+        self.install_ffmpeg_check.grid(row=2)
+        self.install_button.grid(row=3)
+
+    def add_ffmpeg_checkmark(self):
+        """
+        Creates a checkbutton for whether we want to install ffmpeg
+        """
+        result = ttk.Checkbutton(
+            self,
+            text="Install ffmpeg (required)",
+        )
+
+        if ffmpeg_installed():
+            result.state(["!disabled", "!selected", "!alternate"])
+        else:
+            result.state(["disabled", "selected", "!alternate"])
+        return result
 
     def add_button_frame(self):
         """adds the checkbuttons"""
@@ -85,7 +143,13 @@ class InstallFrame(tk.Frame):
             del self.config["presets"][key]
 
         save_config(self.config)
-        # calls regedit and does the installation
+
+        if self.install_ffmpeg_check.instate(["selected"]):
+            InstallFfmpeg()  # opens a TopLevel window
+        self.install_registry()
+
+    def install_registry(self):
+        """Installs registry"""
         show_warning("Install", INSTALL_INSTRUCTIONS, generate_and_install)
 
     def update_default(self):

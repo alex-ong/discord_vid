@@ -61,7 +61,7 @@ def add_to_path(program_path: str):
     )
 
 
-def download_file(source: str, dest: str):
+def download_file(source: str, dest: str, on_update):
     """
     Downloads a file from URL to destination, with a progress update
     """
@@ -80,5 +80,6 @@ def download_file(source: str, dest: str):
                 file.write(data)
                 done = int(50 * downloaded / total_length)
                 done, not_done = "=" * done, " " * (50 - done)
+                on_update(downloaded / float(total_length))
                 sys.stdout.write(f"\r[{done}{not_done}]")
                 sys.stdout.flush()

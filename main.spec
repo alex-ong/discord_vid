@@ -4,11 +4,10 @@ from PyInstaller.utils.hooks import collect_all
 block_cipher = None
 
 added_files = [
-    ("ffmpeg/*", "ffmpeg/"),
     ("data/DEFAULT_CONFIG.json", "data/"),
     ("data/discordvidlogo-24-black.ico", "data/"),
     ("data/discordvidlogo-32.ico", "data/"),
-    ("7z/*", "7z/")	
+    ("7z/*", "7z/")
 ]
 
 datas = []

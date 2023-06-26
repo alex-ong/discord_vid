@@ -1,31 +1,31 @@
 {
     "presets": {
-        "8MB_720p30": {
-            "min_size_mb": 7.2,
-            "max_size_mb": 8.00,
+        "25MB_720p30": {
+            "min_size_mb": 10.0,
+            "max_size_mb": 25.0,
             "args": [ "-vf", "scale=-1:720", "-r", "30", "-b:a", "64k" ]
         },
-        "8MB_720p60": {
-            "min_size_mb": 7.2,
-            "max_size_mb": 8.00,
+        "25MB_720p60": {
+            "min_size_mb": 10.0,
+            "max_size_mb": 25.0,
             "args": [ "-vf", "scale=-1:720", "-r", "60", "-b:a", "64k" ]
         },
         "50MB_1080p30": {
-            "min_size_mb": 45.00,
+            "min_size_mb": 20.00,
             "max_size_mb": 50.00,
             "args": [ "-vf", "scale=-1:1080", "-r", "30", "-b:a", "128k" ]
         },
         "50MB_1080p60": {
-            "min_size_mb": 45.00,
+            "min_size_mb": 20.00,
             "max_size_mb": 50.00,
             "args": [ "-vf", "scale=-1:1080", "-r", "60", "-b:a", "128k" ]
         },
         "100MB": {
-            "min_size_mb": 90.00,
+            "min_size_mb": 40.00,
             "max_size_mb": 100.00,
             "args": ["-b:a", "128k" ]
         }
     },
-    "default_preset": "8MB_720p30",
+    "default_preset": "25MB_720p30",
     "simultaneous_tasks": 4
 }
