@@ -14,7 +14,7 @@ class TaskQueue:
         self.tasks = []
         self.processing_tasks = []
         self.finished_tasks = []
-        self.concurrency = get_config()["simultaneous_tasks"]
+        self.concurrency = get_config().simultaneous_tasks
 
     def get_remaining_tasks(self):
         """return all tasks that are not finished"""

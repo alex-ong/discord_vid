@@ -16,9 +16,9 @@ from gui.noargs import get_error_msg, show_noargs
 USE_GUI = True
 
 
-def convert_no_gui(preset, path):
+def convert_no_gui(preset_name, path):
     """converts a task without the gui"""
-    task = Task(preset, path)
+    task = Task(preset_name, path)
     task.generate_file()
 
 
@@ -44,10 +44,10 @@ def main_non_convert():
     return True
 
 
-def main_convert(preset, path):
+def main_convert(preset_name, path):
     """main function for processing argv and then running program"""
     task_queue = TaskQueue()
-    task_queue.send_task(preset, path)
+    task_queue.send_task(preset_name, path)
     if task_queue.is_master_queue():
         gui_main(task_queue)  # start the gui
     else:

@@ -1,9 +1,14 @@
 """
 Basic global config file.
 """
+from pydantic.dataclasses import dataclass
+from dataclasses import asdict
 import os
 import sys
 import json
+from typing import Dict, List, Optional
+
+
 from collections import OrderedDict
 
 DEFAULT_CONFIG = "data/DEFAULT_CONFIG.json"
@@ -11,6 +16,19 @@ USER_CONFIG = "data/USER_CONFIG.json"
 
 CONFIG = None
 
+@dataclass
+class Preset:
+    """Preset inside USER_CONFIG.json"""
+    min_size_mb: float
+    max_size_mb: float
+    args: List[str]
+    scale: Optional[str] = None
+
+@dataclass
+class Config:
+    presets: Dict[str, Preset]
+    default_preset: str
+    simultaneous_tasks: int
 
 def get_default_config_path():
     """returns default config path"""
@@ -45,17 +63,18 @@ def get_config():
         data2 = {}
 
     data.update(data2)
-    save_config(data)
-
-    CONFIG = data
+    CONFIG = Config(**data)
+    save_config(CONFIG)
+    print(asdict(CONFIG))
     return CONFIG
 
 
-def save_config(data):
+def save_config(data: Config):
     """saves the config file"""
     user_config = get_user_config_path()
     with open(user_config, "w", encoding="utf8") as config:
-        json.dump(data, config, indent=4)
+        data_dict = asdict(data)
+        json.dump(data_dict, config, indent=4)
 
 
 # python -m discord_vid.config

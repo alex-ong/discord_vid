@@ -14,7 +14,6 @@ import sys
 
 from queue import Queue, Empty
 
-from install.install_ffmpeg import FFPROBE_EXE
 from discord_vid import disvid_nvenc
 from discord_vid import disvid_libx264
 from discord_vid.renderingtask import RenderingTask
@@ -27,33 +26,6 @@ class Encoder(Enum):
     CPU = 2
     INTEL = 3
     AMD = 4
-
-
-class Codec(Enum):
-    """Enum representing Codecs of source file"""
-
-    UNKNOWN = 1
-    H264 = 2
-    H265 = 3
-
-    @classmethod
-    def from_str(cls, string: str):
-        """creates Codec from a string"""
-        if string.lower() == "h264":
-            return Codec.H264
-        if string.lower() == "h265":
-            return Codec.H265
-        return Codec.UNKNOWN
-
-
-@dataclass
-class SourceVideoData:
-    """Datatype representing source videos metadata"""
-
-    codec: Codec
-    resolution: Tuple[int, int]
-    duration: float
-
 
 def get_audio_rate(output_options):
     """
@@ -84,41 +56,6 @@ def guess_encoder():
         return Encoder.NVIDIA
 
     return Encoder.CPU
-
-
-def get_video_data(filename):
-    """gets video codec; h264, h265 or CPU"""
-    result = subprocess.run(
-        [
-            FFPROBE_EXE,
-            "-v",
-            "quiet",
-            "-print_format",
-            "json",
-            "-show_format",
-            "-show_streams",
-            filename,
-        ],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        check=True,
-    )
-    json_str = result.stdout
-    print(json_str)
-    data = json.loads(json_str)
-
-    for stream in data["streams"]:
-        if stream["codec_type"] == "video":
-            resolution = (stream["width"], stream["height"])
-            codec_name = stream["codec_name"]
-            duration = float(stream["duration"])
-            return SourceVideoData(
-                codec=Codec.from_str(codec_name),
-                resolution=resolution,
-                duration=duration,
-            )
-    return None
-
 
 def get_index(strings, array):
     """
@@ -160,25 +97,23 @@ def generate_file_loop(generate_file_func, task):
     and starting target file size.
     """
 
-    video_src_data = get_video_data(task.filename)
-    task.set_video_length(video_src_data.duration)
+    file_size = task.file_size
+    target_size = file_size.target_size
+    actual_size = file_loop_iter(file_size.target_size, generate_file_func, task)
 
-    min_size, target_size, max_size = task.size
-    actual_size = file_loop_iter(target_size, generate_file_func, task)
-
-    if actual_size < min_size and not task.is_cancelled():
+    if actual_size < file_size.min_size and not task.is_cancelled():
         task.on_encoder_finish(actual_size, target_size, False)
-        target_size *= float(max_size) / (actual_size * 1.02)
+        target_size *= float(file_size.max_size) / (actual_size * 1.02)
         actual_size = file_loop_iter(target_size, generate_file_func, task)
 
     first_guess = True
-    while actual_size > max_size and not task.is_cancelled():
+    while actual_size > file_size.max_size and not task.is_cancelled():
         task.on_encoder_finish(actual_size, target_size, False)
         if first_guess:
             first_guess = False
-            target_size *= float(max_size * 0.95) / actual_size
+            target_size *= float(file_size.max_size * 0.95) / actual_size
         else:
-            target_size -= int(0.01 * max_size)
+            target_size -= int(0.01 * file_size.max_size)
         actual_size = file_loop_iter(target_size, generate_file_func, task)
 
     task.on_encoder_finish(actual_size, target_size, True)
@@ -213,7 +148,7 @@ def generate_file_loop_iter(target_size, ffmpeg_command_gen, task):
     one loop of the file generation process
     """
     audio_rate = get_audio_rate(task.current_options[1])
-    bitrate = get_bitrate(target_size, task.video_length, audio_rate)
+    bitrate = get_bitrate(target_size, task.src_data.duration, audio_rate)
 
     if bitrate < 0:
         raise ValueError("Not enough bits for video")

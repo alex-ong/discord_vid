@@ -78,7 +78,7 @@ class TaskStatus(tk.Frame):
     def on_task_update(self, seconds_processed, subtask_count):
         """Callback for when the task updates"""
         current_task, num_subtasks = subtask_count
-        perc = seconds_processed / self.task.video_length * 100 / num_subtasks
+        perc = seconds_processed / self.task.src_data.duration * 100 / num_subtasks
         self.progress_bar["value"] = (current_task * 100.0 / num_subtasks) + perc
         self.progress_bar.auto_set_label_perc()
 

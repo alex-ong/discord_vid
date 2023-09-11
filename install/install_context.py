@@ -4,7 +4,7 @@ Toolkit for adding shift+rightclick context menu
 
 import os
 import sys
-from discord_vid.preset import get_presets
+from discord_vid.preset import get_preset_names
 
 
 INSTALL_ACTUAL = "data/install.reg"
@@ -104,11 +104,11 @@ def generate_context():
     header = get_header_string()
     header = header.replace("{exe_path}", exe)
     header = header.replace("{icon_path}", icon)
-    header = header.replace("{sub_commands}", get_sub_commands(get_presets()))
+    header = header.replace("{sub_commands}", get_sub_commands(get_preset_names()))
 
     preset_lines = []
     uninstall_lines = []
-    for preset in get_presets():
+    for preset in get_preset_names():
         preset_line, uninstall_line = get_preset_string(preset, exe)
         preset_lines.extend(preset_line)
         uninstall_lines.append(uninstall_line)

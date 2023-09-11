@@ -24,6 +24,12 @@ def guess_target(max_size):
         return 1.02 * max_size
     return 0.97 * max_size
 
+def get_scale_cmd(resolution, _):
+    """return scale command and whehter it occurs in encode or decode"""
+    if resolution is None:
+        return None, None
+    return ["encode", ["-vf", resolution]]
+
 
 def generate_file_cmd(v_rate, options):
     """
@@ -55,7 +61,7 @@ def generate_file_cmd(v_rate, options):
         + "-v quiet -stats".split()
         + input_options
         + f"-b:v {v_rate:.0f}k -minrate {v_rate/2:.0f}k".split()
-        + f"-maxrate {v_rate*1.5:.0f}k -bufsize 1M".split()
+        + f"-maxrate {v_rate*2:.0f}k -bufsize 1M".split()
         + "-threads 8 -speed 2 -row-mt 1 -tile-columns 2".split()
         + "-pass 2".split()
         + f"-passlogfile {output_file}".split()

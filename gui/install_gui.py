@@ -107,7 +107,7 @@ class InstallFrame(tk.Frame):
         self.checks.clear()
         check_frame = tk.Frame(self)
         tk.Label(check_frame, text="Select presets to install in context menu").grid()
-        keys = list(self.config["presets"].keys())
+        keys = list(self.config.presets.keys())
         for name in keys:
             check_var = tk.BooleanVar(self)
             check_var.set(True)
@@ -126,7 +126,7 @@ class InstallFrame(tk.Frame):
         self.default_preset = tk.StringVar(self)
         self.default_preset.set(self.get_valid_keys()[0])
         self.default_preset_om = tk.OptionMenu(
-            default_frame, self.default_preset, *self.config["presets"].keys()
+            default_frame, self.default_preset, *self.config.presets.keys()
         )
         self.default_preset_om.grid(row=0, column=1, sticky=tk.E)
         default_frame.columnconfigure(0, weight=1)
@@ -135,12 +135,12 @@ class InstallFrame(tk.Frame):
 
     def install(self):
         """installs the presets"""
-        existing_keys = list(self.config["presets"].keys())
+        existing_keys = list(self.config.presets.keys())
         valid_keys = self.get_valid_keys()
         keys_to_delete = [key for key in existing_keys if key not in valid_keys]
         print(f"Delete: {keys_to_delete}")
         for key in keys_to_delete:
-            del self.config["presets"][key]
+            del self.config.presets[key]
 
         save_config(self.config)
 
