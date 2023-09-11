@@ -225,8 +225,11 @@ def parse_time_line(line):
         return None
     pairs = line.split()
     time_str = [pair for pair in pairs if pair.startswith("time")][0]
+    
     time_str = time_str.split("=")[1]  # 00:00:00.000
     if time_str.startswith("-"):  # negative time fix
+        return None
+    if time_str.lower() == "n/a":
         return None
     date_time = datetime.strptime(time_str.split(".")[0], "%H:%M:%S")
     milliseconds = float(time_str.split(".")[1]) * 10
