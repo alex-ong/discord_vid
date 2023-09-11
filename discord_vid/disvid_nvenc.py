@@ -33,7 +33,7 @@ def get_scale_cmd(resolution, src_data: SourceVideoData):
     if resolution is None:
         return None, None
     if src_data.codec == Codec.UNKNOWN:
-        return ["encode", ["-vf", resolution]]
+        return ["encode", ["-vf", f"scale={resolution}"]]
     
     if src_data.codec == Codec.H264:
         codec = "h264_cuvid"

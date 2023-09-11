@@ -28,7 +28,7 @@ def get_scale_cmd(resolution, _):
     """return scale command and whehter it occurs in encode or decode"""
     if resolution is None:
         return None, None
-    return ["encode", ["-vf", resolution]]
+    return ["encode", ["-vf", f"scale={resolution}"]]
 
 
 def generate_file_cmd(v_rate, options):
