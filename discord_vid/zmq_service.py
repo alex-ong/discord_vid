@@ -42,8 +42,8 @@ class ZMQService:
             item = self.server.requests.get_nowait()
         except Empty:
             return None
-        else:
-            return Task(item["preset"], item["file"])
+
+        return Task(item["preset"], item["file"])
 
     def needs_update(self):
         """returns whether we should call update loop"""

@@ -1,5 +1,5 @@
 """
-discord vid nvenc implementation
+Discord vid nvenc implementation
 """
 
 from install.install_ffmpeg import FFMPEG_EXE
@@ -34,7 +34,7 @@ def generate_file_cmd(v_rate, options):
     # fmt: off
     command = (
         [FFMPEG_EXE, "-y"]
-        + "-v quiet -stats".split()
+        + ["-v", "quiet", "-stats"]
         + input_options
         + [ "-c:v", "h264_nvenc",
             "-b:v", f"{v_rate:.0f}k", "-maxrate", f"{v_rate*1.5:.0f}k",

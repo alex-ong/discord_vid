@@ -1,12 +1,17 @@
 """
 A bunch of useful library functions
 """
+from dataclasses import dataclass
 from datetime import timedelta, datetime
+from enum import Enum
+import json
 from threading import Thread, Event
 import os
 import subprocess
+from typing import Tuple
 import sys
-from enum import Enum
+
+
 from queue import Queue, Empty
 
 from install.install_ffmpeg import FFPROBE_EXE
@@ -22,6 +27,32 @@ class Encoder(Enum):
     CPU = 2
     INTEL = 3
     AMD = 4
+
+
+class Codec(Enum):
+    """Enum representing Codecs of source file"""
+
+    UNKNOWN = 1
+    H264 = 2
+    H265 = 3
+
+    @classmethod
+    def from_str(cls, string: str):
+        """creates Codec from a string"""
+        if string.lower() == "h264":
+            return Codec.H264
+        if string.lower() == "h265":
+            return Codec.H265
+        return Codec.UNKNOWN
+
+
+@dataclass
+class SourceVideoData:
+    """Datatype representing source videos metadata"""
+
+    codec: Codec
+    resolution: Tuple[int, int]
+    duration: float
 
 
 def get_audio_rate(output_options):
@@ -55,25 +86,38 @@ def guess_encoder():
     return Encoder.CPU
 
 
-def get_length(filename):
-    """
-    returns length of file in seconds
-    """
-    # fmt: off
+def get_video_data(filename):
+    """gets video codec; h264, h265 or CPU"""
     result = subprocess.run(
         [
-            FFPROBE_EXE, "-v", "error",
-            "-show_entries", "format=duration",
-            "-of", "default=noprint_wrappers=1:nokey=1",
+            FFPROBE_EXE,
+            "-v",
+            "quiet",
+            "-print_format",
+            "json",
+            "-show_format",
+            "-show_streams",
             filename,
         ],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        check=True
+        check=True,
     )
-    # fmt: on
+    json_str = result.stdout
+    print(json_str)
+    data = json.loads(json_str)
 
-    return float(result.stdout)
+    for stream in data["streams"]:
+        if stream["codec_type"] == "video":
+            resolution = (stream["width"], stream["height"])
+            codec_name = stream["codec_name"]
+            duration = float(stream["duration"])
+            return SourceVideoData(
+                codec=Codec.from_str(codec_name),
+                resolution=resolution,
+                duration=duration,
+            )
+    return None
 
 
 def get_index(strings, array):
@@ -116,26 +160,25 @@ def generate_file_loop(generate_file_func, task):
     and starting target file size.
     """
 
-    length = get_length(task.filename)
-    task.set_video_length(length)
+    video_src_data = get_video_data(task.filename)
+    task.set_video_length(video_src_data.duration)
 
     min_size, target_size, max_size = task.size
     actual_size = file_loop_iter(target_size, generate_file_func, task)
 
-    if task.is_cancelled():
-        return
-
-    if actual_size < min_size:
+    if actual_size < min_size and not task.is_cancelled():
         task.on_encoder_finish(actual_size, target_size, False)
         target_size *= float(max_size) / (actual_size * 1.02)
         actual_size = file_loop_iter(target_size, generate_file_func, task)
 
-    if task.is_cancelled():
-        return
-
+    first_guess = True
     while actual_size > max_size and not task.is_cancelled():
         task.on_encoder_finish(actual_size, target_size, False)
-        target_size -= int(0.01 * max_size)
+        if first_guess:
+            first_guess = False
+            target_size *= float(max_size * 0.95) / actual_size
+        else:
+            target_size -= int(0.01 * max_size)
         actual_size = file_loop_iter(target_size, generate_file_func, task)
 
     task.on_encoder_finish(actual_size, target_size, True)
