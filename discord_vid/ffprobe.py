@@ -21,7 +21,7 @@ class Codec(Enum):
         """creates Codec from a string"""
         if string.lower() == "h264":
             return Codec.H264
-        if string.lower() == "h265":
+        if string.lower() == "hevc":
             return Codec.H265
         return Codec.UNKNOWN
 
