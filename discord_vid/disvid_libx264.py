@@ -24,6 +24,7 @@ def guess_target(max_size):
         return 1.02 * max_size
     return 0.97 * max_size
 
+
 def get_scale_cmd(resolution, _):
     """return scale command and whehter it occurs in encode or decode"""
     if resolution is None:

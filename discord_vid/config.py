@@ -1,34 +1,42 @@
 """
 Basic global config file.
 """
-from pydantic.dataclasses import dataclass
+
 from dataclasses import asdict
 import os
 import sys
 import json
 from typing import Dict, List, Optional
-
-
 from collections import OrderedDict
+
+from pydantic.dataclasses import dataclass
 
 DEFAULT_CONFIG = "data/DEFAULT_CONFIG.json"
 USER_CONFIG = "data/USER_CONFIG.json"
 
 CONFIG = None
 
+
 @dataclass
 class Preset:
     """Preset inside USER_CONFIG.json"""
+
     min_size_mb: float
     max_size_mb: float
     args: List[str]
     scale: Optional[str] = None
 
+
 @dataclass
 class Config:
+    """
+    USER_CONFIG.json
+    """
+
     presets: Dict[str, Preset]
     default_preset: str
     simultaneous_tasks: int
+
 
 def get_default_config_path():
     """returns default config path"""

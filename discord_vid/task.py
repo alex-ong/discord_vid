@@ -15,13 +15,15 @@ from discord_vid.disvid_lib import (
 from discord_vid.ffprobe import get_video_data
 
 TaskCallbacks = namedtuple("TaskCallbacks", ["start", "update", "finish"])
-MB_TO_BYTES = 1024*1024
+MB_TO_BYTES = 1024 * 1024
+
 
 @dataclass
 class FileSizeTarget:
     """File size target in bytes"""
-    min_size : int
-    max_size : int
+
+    min_size: int
+    max_size: int
     target_size: int
 
 
@@ -32,7 +34,7 @@ class Task:
         self.preset_name = preset_name
         self.filename = filename
         self.preset = get_preset(self.preset_name)
-        self.file_size = None #setup later when we set encoder
+        self.file_size = None  # setup later when we set encoder
         self.input_options = ["-i", filename]
         self.encoder = guess_encoder()
         self.set_encoder(self.encoder)
@@ -57,15 +59,17 @@ class Task:
         min_size = self.preset.min_size_mb * MB_TO_BYTES
         max_size = self.preset.max_size_mb * MB_TO_BYTES
         target_size = encoder_lib.guess_target(max_size)
-        self.file_size = FileSizeTarget(min_size=min_size,max_size=max_size,target_size=target_size)
+        self.file_size = FileSizeTarget(
+            min_size=min_size, max_size=max_size, target_size=target_size
+        )
 
     def generate_file(self):
         """generates the file by calling generate_file_loop"""
         options = [self.input_options, self.preset.args[:]]
         encoder_lib = get_encoder_lib(self.encoder)
-        
+
         # set scaling (pre vs post)
-        pre_post, command = encoder_lib.get_scale_cmd(self.preset.scale,self.src_data)
+        pre_post, command = encoder_lib.get_scale_cmd(self.preset.scale, self.src_data)
         if pre_post == "decode":
             options[0] = command + options[0]
         elif pre_post == "encode":
@@ -85,7 +89,7 @@ class Task:
         target_size = bytes_to_mb(target_size)
         output_size = bytes_to_mb(output_size)
         max_size = bytes_to_mb(self.file_size.max_size)
-        
+
         if finished:
             message = f"Finished: {output_size:.2f}MB"
             self.finished = True

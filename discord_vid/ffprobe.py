@@ -9,6 +9,7 @@ from pydantic.dataclasses import dataclass
 
 from install.install_ffmpeg import FFPROBE_EXE
 
+
 class Codec(Enum):
     """Enum representing Codecs of source file"""
 
@@ -33,6 +34,7 @@ class SourceVideoData:
     codec: Codec
     resolution: Tuple[int, int]
     duration: float
+
 
 def get_video_data(filename):
     """gets video codec; h264, h265 or CPU"""

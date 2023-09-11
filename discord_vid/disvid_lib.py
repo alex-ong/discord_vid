@@ -1,14 +1,11 @@
 """
 A bunch of useful library functions
 """
-from dataclasses import dataclass
 from datetime import timedelta, datetime
 from enum import Enum
-import json
 from threading import Thread, Event
 import os
 import subprocess
-from typing import Tuple
 import sys
 
 
@@ -26,6 +23,7 @@ class Encoder(Enum):
     CPU = 2
     INTEL = 3
     AMD = 4
+
 
 def get_audio_rate(output_options):
     """
@@ -56,6 +54,7 @@ def guess_encoder():
         return Encoder.NVIDIA
 
     return Encoder.CPU
+
 
 def get_index(strings, array):
     """
@@ -225,7 +224,7 @@ def parse_time_line(line):
         return None
     pairs = line.split()
     time_str = [pair for pair in pairs if pair.startswith("time")][0]
-    
+
     time_str = time_str.split("=")[1]  # 00:00:00.000
     if time_str.startswith("-"):  # negative time fix
         return None
