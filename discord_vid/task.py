@@ -71,11 +71,13 @@ class Task:
         encoder_lib = get_encoder_lib(self.encoder)
 
         # set scaling (pre vs post)
-        pre_post, command = encoder_lib.get_scale_cmd(self.preset.scale, self.src_data)
-        if pre_post == "decode":
-            options[0] = command + options[0]
-        elif pre_post == "encode":
-            options[1] = command + options[1]
+        for pre_post, command in encoder_lib.get_scale_cmd(
+            self.preset.scale, self.src_data
+        ):
+            if pre_post == "decode":
+                options[0] = command + options[0]
+            elif pre_post == "encode":
+                options[1] = command + options[1]
 
         # set output filename
         filename = os.path.splitext(self.filename)[0] + encoder_lib.extension()

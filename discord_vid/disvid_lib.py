@@ -12,7 +12,7 @@ from threading import Event, Thread
 
 import wmi
 
-from discord_vid import disvid_libx264, disvid_nvenc
+from discord_vid import disvid_amf, disvid_libx264, disvid_nvenc
 from discord_vid.renderingtask import RenderingTask
 
 
@@ -38,20 +38,25 @@ def get_encoder_lib(encoder: Encoder):
     """Converts from encoder enum to encoder library"""
     if encoder == Encoder.NVIDIA:
         return disvid_nvenc
+    if encoder == Encoder.AMD:
+        return disvid_amf
 
     return disvid_libx264
 
 
 def guess_encoder():
-    """Checks if you have an nvidia gpu installed."""
+    """Checks if you have an nvidia or amd gpu installed."""
 
     try:
         gpus = wmi.WMI().Win32_VideoController()
     except wmi.x_wmi:
         return Encoder.CPU
 
-    if any("nvidia" in gpu.Name.lower() for gpu in gpus):
+    names = [gpu.Name.lower() for gpu in gpus]
+    if any("nvidia" in name for name in names):
         return Encoder.NVIDIA
+    if any("amd" in name or "radeon" in name for name in names):
+        return Encoder.AMD
 
     return Encoder.CPU
 

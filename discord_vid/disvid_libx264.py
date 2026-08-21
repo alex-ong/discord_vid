@@ -27,10 +27,10 @@ def guess_target(max_size):
 
 
 def get_scale_cmd(resolution, _):
-    """return scale command and whehter it occurs in encode or decode"""
+    """return list of (mode, command) pairs"""
     if resolution is None:
-        return None, None
-    return ["encode", ["-vf", f"scale={resolution}"]]
+        return []
+    return [["encode", ["-vf", f"scale={resolution}"]]]
 
 
 def generate_file_cmd(v_rate, options):

@@ -27,14 +27,14 @@ def guess_target(max_size):
 
 def get_scale_cmd(resolution, src_data: SourceVideoData):
     """
-    returns scale command;
-    and whether it occurs in decode or encode phase
+    returns list of (mode, command) pairs;
+    mode is either "decode" or "encode"
     :param str resolution: 1280:-1
     """
     if resolution is None:
-        return None, None
+        return []
     if src_data.codec == Codec.UNKNOWN:
-        return ["encode", ["-vf", f"scale={resolution}"]]
+        return [["encode", ["-vf", f"scale={resolution}"]]]
 
     if src_data.codec == Codec.H264:
         codec = "h264_cuvid"
@@ -44,7 +44,7 @@ def get_scale_cmd(resolution, src_data: SourceVideoData):
         raise ValueError(f"Unsupported codec: {src_data.codec}")
 
     res_str = get_decode_resolution(resolution, src_data.resolution)
-    return ["decode", ["-c:v", codec, "-resize", res_str]]
+    return [["decode", ["-c:v", codec, "-resize", res_str]]]
 
 
 def get_decode_resolution(target_resolution, source_resolution):
