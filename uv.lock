@@ -144,7 +144,6 @@ dependencies = [
     { name = "pyinstaller" },
     { name = "pyzmq" },
     { name = "requests" },
-    { name = "setuptools" },
     { name = "tkinterdnd2" },
     { name = "wmi" },
 ]
@@ -161,7 +160,6 @@ requires-dist = [
     { name = "pyinstaller", specifier = ">=6.16" },
     { name = "pyzmq", specifier = ">=26" },
     { name = "requests", specifier = "~=2.28" },
-    { name = "setuptools", specifier = "<81" },
     { name = "tkinterdnd2", specifier = "~=0.3" },
     { name = "wmi", specifier = ">=1.5.1" },
 ]
