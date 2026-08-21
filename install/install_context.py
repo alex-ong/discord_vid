@@ -11,38 +11,38 @@ INSTALL_ACTUAL = "data/install.reg"
 UNINSTALL_ACTUAL = "data/uninstall.reg"
 
 COMMAND_STORE = (
-    r"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\\"
-    + r"\CurrentVersion\Explorer\CommandStore\shell\DiscordVid."
+    R"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\\"
+    + R"\CurrentVersion\Explorer\CommandStore\shell\DiscordVid."
 )
 
 
 def get_uninstall_header_string():
     """returns uninstallation header string"""
     strings = [
-        "Windows Registry Editor Version 5.00" + "\n",
-        r"[-HKEY_CLASSES_ROOT\*\shell\DiscordVid]" + "\n",
-        r"[-HKEY_CLASSES_ROOT\Directory\shell\DiscordVid]" + "\n",
-        r"[-" + COMMAND_STORE + "Default]" + "\n",
+        "Windows Registry Editor Version 5.00",
+        R"[-HKEY_CLASSES_ROOT\*\shell\DiscordVid]",
+        R"[-HKEY_CLASSES_ROOT\Directory\shell\DiscordVid]",
+        R"[-" + COMMAND_STORE + "Default]",
     ]
-    return strings
+    return "\n".join(strings)
 
 
 def get_header_string():
     """returns the header string"""
     strings = [
-        r"Windows Registry Editor Version 5.00",
-        r"",
-        r"[HKEY_CLASSES_ROOT\*\shell\DiscordVid]",
-        r'"MUIVerb"="DiscordVid"',
-        r'"SubCommands"="{sub_commands}"',
-        r'"Extended"=""',
-        r'"Icon"="{icon_path}"',
-        r"",
-        r"[" + COMMAND_STORE + "Default]",
-        r'"MUIVerb"="Compress (default)"',
-        r"[" + COMMAND_STORE + r"Default\command]",
-        r'@="\"{exe_path}\" \"default\" \"%1\""',
-        r"",
+        R"Windows Registry Editor Version 5.00",
+        R"",
+        R"[HKEY_CLASSES_ROOT\*\shell\DiscordVid]",
+        R'"MUIVerb"="DiscordVid"',
+        R'"SubCommands"="{sub_commands}"',
+        R'"Extended"=""',
+        R'"Icon"="{icon_path}"',
+        R"",
+        R"[" + COMMAND_STORE + "Default]",
+        R'"MUIVerb"="Compress (default)"',
+        R"[" + COMMAND_STORE + R"Default\command]",
+        R'@="\"{exe_path}\" \"default\" \"%1\""',
+        R"",
     ]
     return "\n".join(strings)
 
