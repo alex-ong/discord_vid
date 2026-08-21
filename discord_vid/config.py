@@ -6,9 +6,9 @@ import json
 import os
 import sys
 from collections import OrderedDict
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 
-from pydantic.dataclasses import dataclass
+from discord_vid.lightweight_pydantic import to_dataclass
 
 DEFAULT_CONFIG = "data/DEFAULT_CONFIG.json"
 USER_CONFIG = "data/USER_CONFIG.json"
@@ -73,7 +73,7 @@ def get_config():
         data2 = {}
 
     data.update(data2)
-    CONFIG = Config(**data)
+    CONFIG = to_dataclass(Config, data)
     print(asdict(CONFIG))
     return CONFIG
 

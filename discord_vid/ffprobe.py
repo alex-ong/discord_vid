@@ -4,9 +4,8 @@ Wrapper around ffprobe
 
 import json
 import subprocess
+from dataclasses import dataclass
 from enum import Enum
-
-from pydantic.dataclasses import dataclass
 
 from install.install_ffmpeg import FFPROBE_EXE
 
