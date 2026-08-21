@@ -28,13 +28,14 @@ class ZMQService:
 
     def __init__(self):
         self.port = 22635
+        self.context = zmq.Context()
 
         self.task_queue = multiprocessing.Queue()
         try:
-            self.server = ZMQServer(self.port, self.task_queue)
+            self.server = ZMQServer(self.context, self.port, self.task_queue)
         except zmq.error.ZMQError:
             self.server = None
-        self.client = ZMQClient(self.port)
+        self.client = ZMQClient(self.context, self.port)
 
     def update(self):
         """update loop for the ZMQ service; returns any requests
@@ -63,9 +64,8 @@ class ZMQServer:
     It writes all requeusts into the queue provided
     """
 
-    def __init__(self, port, task_queue):
+    def __init__(self, context, port, task_queue):
         self.port = port
-        context = zmq.Context()
         self.socket = context.socket(zmq.REP)
         self.socket.bind(f"tcp://127.0.0.1:{port}")
 
@@ -100,9 +100,8 @@ class ZMQServer:
 class ZMQClient:  # pylint: disable-msg=too-few-public-methods
     """simple client that will send a single message then exit"""
 
-    def __init__(self, port):
+    def __init__(self, context, port):
         self.port = port
-        context = zmq.Context()
         self.socket = context.socket(zmq.REQ)
         self.socket.connect(f"tcp://127.0.0.1:{port}")
 

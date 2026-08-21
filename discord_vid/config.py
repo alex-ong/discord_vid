@@ -7,7 +7,6 @@ import os
 import sys
 from collections import OrderedDict
 from dataclasses import asdict
-from typing import Optional
 
 from pydantic.dataclasses import dataclass
 
@@ -24,7 +23,7 @@ class Preset:
     min_size_mb: float
     max_size_mb: float
     args: list[str]
-    scale: Optional[str] = None
+    scale: str | None = None
 
 
 @dataclass
@@ -36,6 +35,8 @@ class Config:
     presets: dict[str, Preset]
     default_preset: str
     simultaneous_tasks: int
+    encoder_cache: str | None = None
+    encoder_cache_date: str | None = None
 
 
 def get_default_config_path():

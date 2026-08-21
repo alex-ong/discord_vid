@@ -5,14 +5,13 @@ A bunch of useful library functions
 import os
 import subprocess
 import sys
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from enum import Enum
 from queue import Empty, Queue
 from threading import Event, Thread
 
-import wmi
-
 from discord_vid import disvid_amf, disvid_libx264, disvid_nvenc
+from discord_vid.config import get_config, save_config
 from discord_vid.renderingtask import RenderingTask
 
 
@@ -45,20 +44,33 @@ def get_encoder_lib(encoder: Encoder):
 
 
 def guess_encoder():
-    """Checks if you have an nvidia or amd gpu installed."""
+    """Checks if you have an nvidia or amd gpu installed. Result is cached
+    in USER_CONFIG.json and only re-checked once per day, since WMI queries
+    are slow and GPUs don't change mid-session."""
+    config = get_config()
+    today = date.today().isoformat()
+    if config.encoder_cache is not None and config.encoder_cache_date == today:
+        return Encoder[config.encoder_cache]
+
+    import wmi  # pylint: disable=import-outside-toplevel
 
     try:
         gpus = wmi.WMI().Win32_VideoController()
     except wmi.x_wmi:
-        return Encoder.CPU
+        encoder = Encoder.CPU
+    else:
+        names = [gpu.Name.lower() for gpu in gpus]
+        if any("nvidia" in name for name in names):
+            encoder = Encoder.NVIDIA
+        elif any("amd" in name or "radeon" in name for name in names):
+            encoder = Encoder.AMD
+        else:
+            encoder = Encoder.CPU
 
-    names = [gpu.Name.lower() for gpu in gpus]
-    if any("nvidia" in name for name in names):
-        return Encoder.NVIDIA
-    if any("amd" in name or "radeon" in name for name in names):
-        return Encoder.AMD
-
-    return Encoder.CPU
+    config.encoder_cache = encoder.name
+    config.encoder_cache_date = today
+    save_config(config)
+    return encoder
 
 
 def get_index(strings, array):
