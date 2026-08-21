@@ -2,12 +2,12 @@
 Basic global config file.
 """
 
-from dataclasses import asdict
+import json
 import os
 import sys
-import json
-from typing import Dict, List, Optional
 from collections import OrderedDict
+from dataclasses import asdict
+from typing import Optional
 
 from pydantic.dataclasses import dataclass
 
@@ -23,7 +23,7 @@ class Preset:
 
     min_size_mb: float
     max_size_mb: float
-    args: List[str]
+    args: list[str]
     scale: Optional[str] = None
 
 
@@ -33,7 +33,7 @@ class Config:
     USER_CONFIG.json
     """
 
-    presets: Dict[str, Preset]
+    presets: dict[str, Preset]
     default_preset: str
     simultaneous_tasks: int
 
@@ -61,11 +61,11 @@ def get_config():
     default_config = get_default_config_path()
     user_config = get_user_config_path()
 
-    with open(default_config, "r", encoding="utf8") as default_file:
+    with open(default_config, encoding="utf8") as default_file:
         data = json.load(default_file, object_pairs_hook=OrderedDict)
 
     try:
-        with open(user_config, "r", encoding="utf8") as user_file:
+        with open(user_config, encoding="utf8") as user_file:
             data2 = json.load(user_file, object_pairs_hook=OrderedDict)
     except FileNotFoundError:
         data2 = {}

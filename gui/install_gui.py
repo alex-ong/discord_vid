@@ -4,10 +4,11 @@ Installation gui
 
 import tkinter as tk
 from tkinter import ttk
+
 from discord_vid.config import get_config, save_config
-from install.install_context import generate_and_install
-from install.install_ffmpeg import install_ffmpeg, ffmpeg_installed
 from gui.uninstall_gui import show_warning
+from install.install_context import generate_and_install
+from install.install_ffmpeg import ffmpeg_installed, install_ffmpeg
 
 INSTALL_INSTRUCTIONS = (
     "Please press Yes a few times for Regedit to install discord_vid.\n"

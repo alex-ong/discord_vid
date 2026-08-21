@@ -2,8 +2,8 @@
 Discord vid nvenc implementation
 """
 
-from install.install_ffmpeg import FFMPEG_EXE
 from discord_vid.ffprobe import Codec, SourceVideoData
+from install.install_ffmpeg import FFMPEG_EXE
 
 # These are defined here because different encoders
 # have different overheads. It's just a starting point.
@@ -40,6 +40,8 @@ def get_scale_cmd(resolution, src_data: SourceVideoData):
         codec = "h264_cuvid"
     elif src_data.codec == Codec.H265:
         codec = "hevc_cuvid"
+    else:
+        raise ValueError(f"Unsupported codec: {src_data.codec}")
 
     res_str = get_decode_resolution(resolution, src_data.resolution)
     return ["decode", ["-c:v", codec, "-resize", res_str]]

@@ -2,13 +2,15 @@
 main gui for the program
 """
 
-import time
 import os
+import time
 import tkinter as tk
 from tkinter.messagebox import askyesno
-from tkinterdnd2 import TkinterDnD, DND_FILES
-from install.install_context import get_install_path
+
+from tkinterdnd2 import DND_FILES, TkinterDnD
+
 from gui.task_status import TaskStatus
+from install.install_context import get_install_path
 
 MAIN_APP = None
 MAIN_GUI = None

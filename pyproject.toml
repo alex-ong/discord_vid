@@ -14,9 +14,11 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pre-commit>=4.3.0",
-    "pylint",
     "ruff>=0.16.4",
 ]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "C90", "I", "N", "UP", "B"]
 
 [tool.ruff.format]
 line-ending = "lf"

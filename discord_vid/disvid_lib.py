@@ -2,19 +2,17 @@
 A bunch of useful library functions
 """
 
-from datetime import timedelta, datetime
-from enum import Enum
-from threading import Thread, Event
 import os
 import subprocess
 import sys
+from datetime import datetime, timedelta
+from enum import Enum
+from queue import Empty, Queue
+from threading import Event, Thread
 
 import wmi
 
-from queue import Queue, Empty
-
-from discord_vid import disvid_nvenc
-from discord_vid import disvid_libx264
+from discord_vid import disvid_libx264, disvid_nvenc
 from discord_vid.renderingtask import RenderingTask
 
 

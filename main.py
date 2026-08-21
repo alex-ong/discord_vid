@@ -3,16 +3,16 @@ Main entrypoint to program.
 Use program with preset and file.
 """
 
-import sys
 import os
+import sys
 
 from discord_vid.preset import display_presets
 from discord_vid.task import Task
 from discord_vid.taskqueue import TaskQueue
-from gui.main_gui import main as gui_main
 from gui.install_gui import main as install_main
-from gui.uninstall_gui import main as uninstall_main
+from gui.main_gui import main as gui_main
 from gui.noargs import get_error_msg, show_noargs
+from gui.uninstall_gui import main as uninstall_main
 
 USE_GUI = True
 

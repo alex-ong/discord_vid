@@ -3,9 +3,9 @@ Task status frame
 """
 
 import tkinter as tk
-from gui.labeledprogress import LabeledProgressBar
-from discord_vid.task import Task, TaskCallbacks
 
+from discord_vid.task import Task, TaskCallbacks
+from gui.labeledprogress import LabeledProgressBar
 
 # style = ttk.Style()
 # style.theme_use('clam')

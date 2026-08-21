@@ -2,18 +2,19 @@
 Basic task framework on ffmpeg tasks
 """
 
-from dataclasses import dataclass
 import os
 from collections import namedtuple
-from discord_vid.preset import get_preset
+from dataclasses import dataclass
+
 from discord_vid.disvid_lib import (
-    guess_encoder,
-    get_encoder_lib,
     Encoder,
-    generate_file_loop_threaded,
     bytes_to_mb,
+    generate_file_loop_threaded,
+    get_encoder_lib,
+    guess_encoder,
 )
 from discord_vid.ffprobe import get_video_data
+from discord_vid.preset import get_preset
 
 TaskCallbacks = namedtuple("TaskCallbacks", ["start", "update", "finish"])
 MB_TO_BYTES = 1024 * 1024
@@ -98,6 +99,8 @@ class Task:
             message = f"Too small: {output_size:.2f}MB"
         elif output_size > max_size:
             message = f"Too big: {output_size:.2f}MB"
+        else:
+            message = f"In progress: {output_size:.2f}MB"
 
         if self.callbacks.finish is not None:
             self.callbacks.finish(finished, message)

@@ -4,8 +4,8 @@ Toolkit for adding shift+rightclick context menu
 
 import os
 import sys
-from discord_vid.preset import get_preset_names
 
+from discord_vid.preset import get_preset_names
 
 INSTALL_ACTUAL = "data/install.reg"
 UNINSTALL_ACTUAL = "data/uninstall.reg"

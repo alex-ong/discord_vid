@@ -2,12 +2,12 @@
 Helper functions for registry adding and downloading files
 """
 
-import sys
 import ctypes  # Allows interface with low-level C API's
 import os
+import sys
 import winreg  # Allows access to the windows registry
-import requests
 
+import requests
 
 # ctypes constants and function pointer
 HWND_BROADCAST = 0xFFFF

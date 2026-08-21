@@ -2,10 +2,10 @@
 Wrapper around ffprobe
 """
 
-from enum import Enum
 import json
 import subprocess
-from typing import Tuple
+from enum import Enum
+
 from pydantic.dataclasses import dataclass
 
 from install.install_ffmpeg import FFPROBE_EXE
@@ -33,7 +33,7 @@ class SourceVideoData:
     """Datatype representing source videos metadata"""
 
     codec: Codec
-    resolution: Tuple[int, int]
+    resolution: tuple[int, int]
     duration: float
 
 

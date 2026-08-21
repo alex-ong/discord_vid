@@ -5,6 +5,7 @@ simple dialog box to uninstall
 import os
 import tkinter as tk
 from tkinter import messagebox
+
 from install.install_context import uninstall_context
 
 MSG = "Please press Yes a few times for Regedit to uninstall the discord_vid"

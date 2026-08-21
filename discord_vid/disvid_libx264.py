@@ -3,6 +3,7 @@ discord vid libx264 implementation
 """
 
 import os
+
 from install.install_ffmpeg import FFMPEG_EXE
 
 # These are defined here because different encoders
