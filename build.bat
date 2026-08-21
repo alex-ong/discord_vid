@@ -1,2 +1,2 @@
-pipenv install
-pipenv run pyinstaller main.spec --noconfirm
+uv sync
+uv run pyinstaller main.spec --noconfirm

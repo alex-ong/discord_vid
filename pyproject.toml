@@ -1,0 +1,16 @@
+[project]
+name = "discord-vid"
+version = "0.1.0"
+requires-python = "==3.9.*"
+dependencies = [
+    "requests~=2.28",
+    "pyinstaller~=5.2",
+    "pyzmq~=23.2",
+    "tkinterdnd2~=0.3",
+    "pydantic~=2.3",
+]
+
+[dependency-groups]
+dev = [
+    "pylint",
+]
