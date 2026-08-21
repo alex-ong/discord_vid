@@ -12,7 +12,7 @@ def get_preset(preset_name: str):
     config = get_config()
     presets = config.presets
     if preset_name.lower() == "default":
-        preset_name = config.presets["default_preset"]
+        preset_name = config.default_preset
     if preset_name not in presets:
         raise ValueError(f"Invalid preset: {preset_name}")
     return presets[preset_name]
