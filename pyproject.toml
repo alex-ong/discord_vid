@@ -9,6 +9,7 @@ dependencies = [
     "tkinterdnd2~=0.3",
     "pydantic~=2.3",
     "wmi>=1.5.1",
+    "tzdata>=2026.3",
 ]
 
 [dependency-groups]

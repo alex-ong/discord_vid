@@ -68,12 +68,12 @@ def get_config():
     try:
         with open(user_config, encoding="utf8") as user_file:
             data2 = json.load(user_file, object_pairs_hook=OrderedDict)
-    except FileNotFoundError:
+    except FileNotFoundError, json.JSONDecodeError:
+        # missing, or being written concurrently by another instance
         data2 = {}
 
     data.update(data2)
     CONFIG = Config(**data)
-    save_config(CONFIG)
     print(asdict(CONFIG))
     return CONFIG
 
@@ -81,9 +81,14 @@ def get_config():
 def save_config(data: Config):
     """saves the config file"""
     user_config = get_user_config_path()
-    with open(user_config, "w", encoding="utf8") as config:
-        data_dict = asdict(data)
+    data_dict = asdict(data)
+
+    # write to a temp file then atomically replace, so concurrently-launched
+    # instances never read a partially-written/corrupted file
+    tmp_path = f"{user_config}.tmp"
+    with open(tmp_path, "w", encoding="utf8") as config:
         json.dump(data_dict, config, indent=4)
+    os.replace(tmp_path, user_config)
 
 
 # python -m discord_vid.config
