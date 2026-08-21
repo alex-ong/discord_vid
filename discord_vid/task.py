@@ -1,6 +1,7 @@
 """
 Basic task framework on ffmpeg tasks
 """
+
 from dataclasses import dataclass
 import os
 from collections import namedtuple

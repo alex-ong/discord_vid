@@ -1,6 +1,7 @@
 """
 A progressbar capable of having a label inside
 """
+
 from tkinter import ttk
 
 
@@ -11,9 +12,9 @@ class LabeledProgressBar(ttk.Progressbar):  # pylint: disable=too-many-ancestors
 
     def __init__(self, *args, **kwargs):
         classname = type(self).__name__
-        assert (
-            "style" not in kwargs
-        ), f'{classname} initializer does not support providing a ttk "style".'
+        assert "style" not in kwargs, (
+            f'{classname} initializer does not support providing a ttk "style".'
+        )
         type(self)._inst_count += 1  # Increment class attribute.
         # Create a style with a different name for each instance.
 
@@ -50,7 +51,7 @@ class LabeledProgressBar(ttk.Progressbar):  # pylint: disable=too-many-ancestors
     def auto_set_label_perc(self, auto_color=True):
         """sets the label to match its progress percent"""
         progress, maximum = self["value"], self["maximum"]
-        perc_string = f"{progress/float(maximum)*100:.2f}%"
+        perc_string = f"{progress / float(maximum) * 100:.2f}%"
         self.style.configure(self.stylename, text=perc_string)
         if auto_color:
             self.set_auto_color()

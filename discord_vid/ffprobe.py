@@ -1,6 +1,7 @@
 """
 Wrapper around ffprobe
 """
+
 from enum import Enum
 import json
 import subprocess

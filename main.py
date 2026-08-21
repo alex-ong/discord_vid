@@ -2,6 +2,7 @@
 Main entrypoint to program.
 Use program with preset and file.
 """
+
 import sys
 import os
 

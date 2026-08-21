@@ -8,9 +8,15 @@ dependencies = [
     "pyzmq~=23.2",
     "tkinterdnd2~=0.3",
     "pydantic~=2.3",
+    "wmi>=1.5.1",
 ]
 
 [dependency-groups]
 dev = [
+    "pre-commit>=4.3.0",
     "pylint",
+    "ruff>=0.16.4",
 ]
+
+[tool.ruff.format]
+line-ending = "lf"

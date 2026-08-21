@@ -133,3 +133,4 @@ dmypy.json
 /7z*.exe
 /data/USER_CONFIG.json
 /.vscode/settings.json
+/test.mp4

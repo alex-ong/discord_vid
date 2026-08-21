@@ -2,6 +2,7 @@
 Task queueing class
 For when we have way too many tasks
 """
+
 from discord_vid.config import get_config
 from discord_vid.zmq_service import ZMQService
 

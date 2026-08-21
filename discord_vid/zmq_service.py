@@ -1,6 +1,7 @@
 """
 Automatic zmq service to send/receive based on whether we are first service or not.
 """
+
 import json
 import multiprocessing
 import threading

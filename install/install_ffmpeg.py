@@ -1,6 +1,7 @@
 """
 Helpers for installing ffmpeg
 """
+
 import os
 import subprocess
 

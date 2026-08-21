@@ -1,6 +1,7 @@
 """
 A bunch of useful library functions
 """
+
 from datetime import timedelta, datetime
 from enum import Enum
 from threading import Thread, Event
@@ -8,6 +9,7 @@ import os
 import subprocess
 import sys
 
+import wmi
 
 from queue import Queue, Empty
 
@@ -45,12 +47,12 @@ def get_encoder_lib(encoder: Encoder):
 def guess_encoder():
     """Checks if you have an nvidia gpu installed."""
 
-    args = "wmic path win32_VideoController get name"
-    result = subprocess.run(args.split(), capture_output=True, check=True)
-    items = result.stdout.lower().split()
-    items = [item.decode("utf-8") for item in items]
+    try:
+        gpus = wmi.WMI().Win32_VideoController()
+    except wmi.x_wmi:
+        return Encoder.CPU
 
-    if "nvidia" in items:
+    if any("nvidia" in gpu.Name.lower() for gpu in gpus):
         return Encoder.NVIDIA
 
     return Encoder.CPU

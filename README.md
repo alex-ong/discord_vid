@@ -35,5 +35,3 @@ You can then run the uninstaller and installer to update the Windows Registry
 
 # Uninstallation
 Uninstall by running `uninstall.bat`
-
-

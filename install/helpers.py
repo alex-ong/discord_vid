@@ -1,6 +1,7 @@
 """
 Helper functions for registry adding and downloading files
 """
+
 import sys
 import ctypes  # Allows interface with low-level C API's
 import os
