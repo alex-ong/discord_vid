@@ -61,10 +61,20 @@ def get_video_data(filename):
         if stream["codec_type"] == "video":
             resolution = (stream["width"], stream["height"])
             codec_name = stream["codec_name"]
-            duration = float(stream["duration"])
+            duration = get_duration(stream, data["format"])
             return SourceVideoData(
                 codec=Codec.from_str(codec_name),
                 resolution=resolution,
                 duration=duration,
             )
     return None
+
+
+def get_duration(stream, container_format):
+    """
+    gets duration from the video stream, falling back to the container's
+    overall duration (some containers, e.g. mkv, omit per-stream duration)
+    """
+    if "duration" in stream:
+        return float(stream["duration"])
+    return float(container_format["duration"])

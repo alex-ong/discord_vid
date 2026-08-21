@@ -10,7 +10,7 @@ from install.helpers import download_file
 FFMPEG_PATH = "./ffmpeg/"
 FFMPEG_EXE = "ffmpeg/ffmpeg.exe"
 FFPROBE_EXE = "ffmpeg/ffprobe.exe"
-URL = "https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-6.1.1-full_build.7z"
+URL = "https://github.com/GyanD/codexffmpeg/releases/download/6.1.1/ffmpeg-6.1.1-full_build.7z"
 OUT_ZIP = "./ffmpeg/ffmpeg.7z"
 
 
