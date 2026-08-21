@@ -55,6 +55,7 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon="data/discordvidlogo-32.ico",
+    contents_directory=".",
 )
 coll = COLLECT(
     exe,
