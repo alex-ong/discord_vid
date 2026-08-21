@@ -212,7 +212,9 @@ def run_ffmpeg_with_status(command, stop_event, callback, subtask_id):
         stderr=subprocess.STDOUT,
         universal_newlines=True,
         bufsize=1,
-        startupinfo=hide_ffmpeg(),
+        # CREATE_NO_WINDOW alone (no startupinfo) - combining both hangs
+        # under Windows Terminal's console-handoff mechanism
+        creationflags=subprocess.CREATE_NO_WINDOW,
     ) as process:
         thread = Thread(target=enqueue_output, args=(process.stdout, queue, stop_event))
         thread.daemon = True
@@ -256,13 +258,6 @@ def parse_time_line(line):
         milliseconds=milliseconds,
     )
     return delta.total_seconds()
-
-
-def hide_ffmpeg():
-    """returns a startupinfo that can hide ffmpeg"""
-    startup_info = subprocess.STARTUPINFO()
-    startup_info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-    return startup_info
 
 
 def main():

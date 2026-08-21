@@ -53,6 +53,9 @@ def get_video_data(filename):
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         check=True,
+        # skip allocating a console entirely, avoiding Windows Terminal's
+        # slow console-handoff when it's the default terminal app
+        creationflags=subprocess.CREATE_NO_WINDOW,
     )
     json_str = result.stdout
     data = json.loads(json_str)
